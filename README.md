@@ -1,11 +1,25 @@
+<div align="center">
+
+<img src=".github/hero.svg" alt="mind-palace-agent-skills — ingest your GitHub, witness the week, grow a palace" width="100%" />
+
 # mind-palace-agent-skills
 
-Portable agent skills that run the [Blessing Protocol](https://github.com/frankxai/bless) — ingest a
-builder's GitHub, witness the week, and grow a palace from what is whole.
+### Portable agent skills that run the [Blessing Protocol](https://github.com/frankxai/bless)
 
-Install into any agent runtime that reads `SKILL.md` skills (Claude Code, Claude.ai, Cursor, Codex,
-Gemini, and others). Each skill is self-contained and follows the two-field frontmatter convention
-(`name` + `description`).
+> Ingest a builder's GitHub, witness the week, and grow a palace from what is whole. Self-contained
+> `SKILL.md` skills for Claude Code, Claude.ai, Cursor, Codex, Gemini, and any runtime that reads them.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-f4c97a.svg)](LICENSE)
+[![Built on SIP](https://img.shields.io/badge/Built%20on-SIP-c9b6ff.svg)](https://github.com/frankxai/Starlight-Intelligence-System)
+[![Blessing Protocol](https://img.shields.io/badge/Blessing%20Protocol-v0.1-f4c97a.svg)](https://github.com/frankxai/bless)
+[![Skills](https://img.shields.io/badge/skills-4-f4c97a.svg)](docs/CATALOG.md)
+[![Validate](https://github.com/frankxai/mind-palace-agent-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/frankxai/mind-palace-agent-skills/actions/workflows/validate.yml)
+
+[**The skills**](#the-skills) · [**The loop**](#the-loop) · [**Install**](#install) · [**Catalog**](docs/CATALOG.md) · [**Contribute**](CONTRIBUTING.md)
+
+</div>
+
+---
 
 ## The skills
 
@@ -16,21 +30,28 @@ Gemini, and others). Each skill is self-contained and follows the two-field fron
 | [`palace-build`](skills/palace-build/SKILL.md) | grow | Turn the ledger into `rooms.json` + a portable HTML palace. |
 | [`blessing-standard`](skills/blessing-standard/SKILL.md) | onboard | Scaffold the five Blessing Protocol files into any repo, filled from what the repo is. |
 
-## Commands
-
-`/sunday` (the full loop) · `/bless <slug>` (single-piece ratification) · `/palace` (rebuild the palace).
-Auto-activation rules live in [`skill-rules.json`](skill-rules.json).
+Each skill carries a `references/` deep-dive where it earns one — the
+[voice register](skills/weekly-blessing/references/voice-register.md),
+[3D craft](skills/palace-build/references/3d-craft.md), and
+[connectors](skills/github-bless/references/connectors.md).
 
 ## The loop
 
+```mermaid
+flowchart LR
+  S["/sunday"] --> G["github-bless<br/>ingest"]
+  G --> W["weekly-blessing<br/>witness"]
+  W --> P["palace-build<br/>grow"]
+  P --> Palace["a palace that<br/>grows each week"]
 ```
-/sunday → github-bless (ingest) → weekly-blessing (witness) → palace-build (grow)
-```
+
+Commands: `/sunday` (the full loop) · `/bless <slug>` (single-piece ratification) · `/palace` (rebuild).
+Auto-activation rules live in [`skill-rules.json`](skill-rules.json).
 
 ## Install
 
 ```bash
-# copy the skills into your agent's skills directory, e.g.
+# copy the skills + commands into your agent's directory, e.g.
 cp -r skills/* ~/.claude/skills/
 cp -r commands/* ~/.claude/commands/
 ```
@@ -38,17 +59,19 @@ cp -r commands/* ~/.claude/commands/
 ## Validate
 
 ```bash
-python scripts/validate_skills.py
+python scripts/validate_skills.py            # frontmatter + rules
+python scripts/generate_catalog.py --check   # catalog + index in sync
 ```
 
-## Relationship to the ecosystem
+A browsable catalog is generated to [`docs/`](docs/CATALOG.md) and served via GitHub Pages.
 
-- **Standard:** [`bless`](https://github.com/frankxai/bless) — the protocol these skills implement.
-- **Reference adoption:** [`frankx-mind-palace`](https://github.com/frankxai/frankx-mind-palace) — the data.
-- **Renderer:** [`frankx-palace`](https://github.com/frankxai/frankx-palace) — the 3D palace.
+## The Blessing family
 
-## License
+| Repo | Role |
+|---|---|
+| [**bless**](https://github.com/frankxai/bless) | The open standard — the Blessing Protocol |
+| [**mind-palace-agent-skills**](https://github.com/frankxai/mind-palace-agent-skills) | Portable agent skills — ingest · witness · grow |
+| [**frankx-mind-palace**](https://github.com/frankxai/frankx-mind-palace) | The mind — Frank's blessed work as data |
+| [**frankx-palace**](https://github.com/frankxai/frankx-palace) | The palace — the 3D memory palace that grows each Sunday |
 
-MIT. See [`LICENSE`](LICENSE).
-
-Built on SIP · The Blessing Protocol v0.1
+<sub>Built on SIP · The Blessing Protocol v0.1 · MIT</sub>
