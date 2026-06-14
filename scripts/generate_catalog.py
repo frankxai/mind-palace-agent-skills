@@ -100,7 +100,8 @@ def render_catalog(skills: list[dict]) -> str:
 
 
 def render_index(skills: list[dict]) -> str:
-    data = json.dumps(skills, ensure_ascii=False, separators=(",", ":"))
+    # Escape `<` so a description containing `</script>` cannot break out of the data tag (XSS).
+    data = json.dumps(skills, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     n = len(skills)
     return f"""<!doctype html>
 <html lang="en">
