@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/frankxai/mind-palace-agent-skills/spec/palace.schema.json",
+  "title": "Memory Palace",
+  "description": "A four-level memory palace (palace -> rooms -> stations -> loci) per the Memory Palace Method v0.1. Readers MUST tolerate unknown fields and default missing optional ones.",
+  "type": "object",
+  "required": ["type", "version", "id", "title", "rooms"],
+  "properties": {
+    "type": { "const": "memory-palace" },
+    "version": { "type": "string" },
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "owner": { "type": "string" },
+    "locus": {
+      "type": "object",
+      "description": "The real or imagined place the palace is built on.",
+      "properties": {
+        "kind": { "enum": ["real", "imagined", "hybrid"] },
+        "basis": { "type": "string" },
+        "route": { "type": "string", "description": "Human-readable ordered route." }
+      }
+    },
+    "rooms": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/room" }
+    }
+  },
+  "$defs": {
+    "surface": {
+      "description": "Shared material vocabulary, pinned to Blessing Protocol SPEC v0.1 §5.",
+      "enum": ["obsidian", "glass", "bronze", "marble", "aurora", "slate"]
+    },
+    "room": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "order": { "type": "integer", "description": "Position along the fixed route; 0 is first." },
+        "surface": { "$ref": "#/$defs/surface" },
+        "accent": { "type": "string", "description": "Single hex accent colour, e.g. #ffcf6b." },
+        "stations": { "type": "array", "items": { "$ref": "#/$defs/station" } }
+      }
+    },
+    "station": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "order": { "type": "integer" },
+        "loci": { "type": "array", "items": { "$ref": "#/$defs/locus" } }
+      }
+    },
+    "locus": {
+      "type": "object",
+      "required": ["id", "target"],
+      "properties": {
+        "id": { "type": "string" },
+        "target": { "type": "string", "description": "What is being memorised at this locus." },
+        "fact": { "type": "string", "description": "Optional elaboration of the target." },
+        "image": { "$ref": "#/$defs/image" },
+        "recall": { "$ref": "#/$defs/recall" },
+        "refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional source paths/URLs (used by agent-memory-palace)."
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "description": "The encoded image for this locus, written by loci-encoder.",
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "description": "The mental image, in words." },
+        "techniques": {
+          "type": "array",
+          "items": {
+            "enum": ["bizarreness", "multisensory", "exaggeration", "emotion", "motion", "dual-coding", "self-reference", "pao", "major-system", "dominic"]
+          }
+        },
+        "prompt": { "type": "string", "description": "Image-generation prompt for palace-visualizer." },
+        "asset": { "type": "string", "description": "Relative path to a rendered image, if any." }
+      }
+    },
+    "recall": {
+      "type": "object",
+      "description": "Spaced-repetition state, owned by spaced-recall / palace-walk. Absent until first review.",
+      "properties": {
+        "scheduler": { "enum": ["fsrs", "sm2"] },
+        "stability": { "type": "number" },
+        "difficulty": { "type": "number" },
+        "due": { "type": "string", "description": "ISO-8601 date the locus is next due." },
+        "reps": { "type": "integer" },
+        "lapses": { "type": "integer" },
+        "lastReviewed": { "type": "string", "description": "ISO-8601 date." }
+      }
+    }
+  }
+}

@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Zero-dependency validator for mind-palace-agent-skills.
 
-Enforces the Blessing Protocol skill-authoring conventions:
+Enforces the skill-authoring conventions for both suites (Memory Palace + Blessing):
 - every skill lives at skills/<name>/SKILL.md
-- YAML-ish frontmatter has exactly the fields `name` and `description`
+- frontmatter carries `name` and `description` (an optional `version` is tolerated;
+  any other field is ignored)
 - `name` is lowercase, hyphenated, <= 64 chars, and matches the directory
-- `description` is non-empty and <= 1024 chars
-- skill-rules.json is valid JSON and references skills that exist
+- `description` is non-empty, single-line, and <= 1024 chars
+- skill-rules.json is valid JSON, references only skills that exist, and registers
+  every skill directory (the reverse check — no skill goes unregistered)
+- spec/palace.schema.json and any spec/examples/*.palace.json parse as JSON
 
 Exit code 0 if all pass, 1 otherwise. Usage: python scripts/validate_skills.py
 """
@@ -46,10 +49,13 @@ def validate_skill(skill_md: Path) -> None:
         errors.append(f"{rel}: file must be named SKILL.md")
         return
     dir_name = skill_md.parent.name
-    fm = parse_frontmatter(skill_md.read_text(encoding="utf-8"))
+    text = skill_md.read_text(encoding="utf-8")
+    fm = parse_frontmatter(text)
     if fm is None:
         errors.append(f"{rel}: missing or malformed frontmatter")
         return
+    if re.search(r"^description:\s*[>|]", text, re.MULTILINE):
+        errors.append(f"{rel}: description must be single-line (no folded/literal YAML `>`/`|`)")
     name = fm.get("name", "")
     desc = fm.get("description", "")
     if not name:
@@ -84,15 +90,27 @@ def main() -> int:
             else:
                 skills = rules.get("skills")
                 if isinstance(skills, dict):
+                    registered = set(skills)
                     for key in skills:
                         if key not in names:
                             errors.append(f"skill-rules.json references unknown skill '{key}'")
+                    # reverse check — every skill directory must be registered
+                    for skill_name in sorted(names - registered):
+                        errors.append(f"skill '{skill_name}' has no skill-rules.json entry")
                 elif skills is not None:
                     errors.append("skill-rules.json: 'skills' field must be a JSON object")
         except json.JSONDecodeError as exc:
             errors.append(f"skill-rules.json: invalid JSON — {exc}")
     else:
         errors.append("skill-rules.json missing")
+
+    # spec JSON artifacts must parse (schema + worked examples)
+    for json_path in [ROOT / "spec" / "palace.schema.json", *sorted((ROOT / "spec" / "examples").glob("*.palace.json"))]:
+        if json_path.exists():
+            try:
+                json.loads(json_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as exc:
+                errors.append(f"{json_path.relative_to(ROOT)}: invalid JSON — {exc}")
 
     if errors:
         print("FAIL — Blessing Protocol skill validation")
