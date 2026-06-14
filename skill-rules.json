@@ -1,0 +1,41 @@
+{
+  "version": "0.1",
+  "description": "Auto-activation rules for the mind-palace-agent-skills — the portable agent skills of the Blessing Protocol (github.com/frankxai/bless).",
+  "skills": {
+    "github-bless": {
+      "priority": "high",
+      "description": "Ingest a builder's GitHub + connectors and roll the week into a blessable candidate set.",
+      "skill_path": "skills/github-bless/SKILL.md",
+      "triggers": {
+        "keywords": ["roll my week", "what did i ship", "ingest my repos", "ingest github", "roll the week", "weekly roll-up"],
+        "precedes": ["weekly-blessing"]
+      }
+    },
+    "weekly-blessing": {
+      "priority": "high",
+      "description": "The Sunday ritual — witness, ratify what is whole, name what to ignore, surface the one path.",
+      "skill_path": "skills/weekly-blessing/SKILL.md",
+      "triggers": {
+        "keywords": ["weekly blessing", "sunday review", "bless this week", "bless the week", "palace review", "witness the week"],
+        "commands": ["/sunday", "/bless", "/palace"]
+      }
+    },
+    "palace-build": {
+      "priority": "medium",
+      "description": "Turn the blessing ledger into rooms.json + a portable HTML palace.",
+      "skill_path": "skills/palace-build/SKILL.md",
+      "triggers": {
+        "keywords": ["build my palace", "build the palace", "render the palace", "regenerate rooms", "rebuild rooms.json"],
+        "follows": ["weekly-blessing"]
+      }
+    },
+    "blessing-standard": {
+      "priority": "medium",
+      "description": "Scaffold the five Blessing Protocol files into any repo, filled from what the repo is.",
+      "skill_path": "skills/blessing-standard/SKILL.md",
+      "triggers": {
+        "keywords": ["adopt bless", "make this repo blessable", "scaffold the blessing files", "set up the mind palace standard", "blessing standard"]
+      }
+    }
+  }
+}
