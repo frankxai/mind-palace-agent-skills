@@ -10,6 +10,8 @@ Enforces the Blessing Protocol skill-authoring conventions:
 
 Exit code 0 if all pass, 1 otherwise. Usage: python scripts/validate_skills.py
 """
+from __future__ import annotations
+
 import json
 import re
 import sys
@@ -66,7 +68,7 @@ def validate_skill(skill_md: Path) -> None:
 
 
 def main() -> int:
-    skill_files = sorted(SKILLS_DIR.glob("*/SKILL.md")) if SKILLS_DIR.exists() else []
+    skill_files = sorted(SKILLS_DIR.glob("*/SKILL.md")) if SKILLS_DIR.is_dir() else []
     if not skill_files:
         errors.append("no skills found under skills/*/SKILL.md")
     names = set()
@@ -77,9 +79,16 @@ def main() -> int:
     if RULES.exists():
         try:
             rules = json.loads(RULES.read_text(encoding="utf-8"))
-            for key in rules.get("skills", {}):
-                if key not in names:
-                    errors.append(f"skill-rules.json references unknown skill '{key}'")
+            if not isinstance(rules, dict):
+                errors.append("skill-rules.json: root must be a JSON object")
+            else:
+                skills = rules.get("skills")
+                if isinstance(skills, dict):
+                    for key in skills:
+                        if key not in names:
+                            errors.append(f"skill-rules.json references unknown skill '{key}'")
+                elif skills is not None:
+                    errors.append("skill-rules.json: 'skills' field must be a JSON object")
         except json.JSONDecodeError as exc:
             errors.append(f"skill-rules.json: invalid JSON — {exc}")
     else:
