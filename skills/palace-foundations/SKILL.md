@@ -1,7 +1,6 @@
 ---
 name: palace-foundations
 description: Teach the method of loci and route the user to the right memory-palace skill. Use when someone says "teach me the memory palace", "how does the method of loci work", "help me memorize X", "I want to remember a list/speech/deck", or is new to spatial memory. The start-here skill that explains the four-level model then dispatches to architect, encoder, number-memory, walk, or spaced-recall.
-version: 0.1
 ---
 
 # palace-foundations

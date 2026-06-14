@@ -1,7 +1,6 @@
 ---
 name: memory-palace-architect
 description: Design a memory palace — choose a real or imagined locus, lay a fixed non-crossing route, and space the stations. Use when the user says "design a memory palace", "pick a place to memorize in", "lay out my palace", "map a route for N items", or needs a structure before encoding. Writes the rooms/stations skeleton of palace.json for loci-encoder to fill.
-version: 0.1
 ---
 
 # memory-palace-architect

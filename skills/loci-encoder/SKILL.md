@@ -1,7 +1,6 @@
 ---
 name: loci-encoder
 description: Turn each target into a vivid, memorable image and place it at a station. Use when the user says "encode these items", "make images for my palace", "help me remember names and faces", "turn this list into pictures", or after memory-palace-architect lays out the rooms. Applies bizarreness, multisensory, exaggeration, motion, and dual-coding; fills the loci[] of palace.json.
-version: 0.1
 ---
 
 # loci-encoder

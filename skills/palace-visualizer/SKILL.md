@@ -1,7 +1,6 @@
 ---
 name: palace-visualizer
 description: Render a memory palace as a navigable artifact — a self-contained HTML viewer plus image-generation prompts for each locus. Use when the user says "render my palace", "visualize the palace", "make a picture of my memory palace", "build out the palace", or wants a keepable visual. Reads palace.json, emits a standalone index.html (no build step) and per-locus image prompts; tolerates both memory-palace and blessing schemas.
-version: 0.1
 ---
 
 # palace-visualizer

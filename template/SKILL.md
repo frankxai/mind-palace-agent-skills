@@ -1,7 +1,6 @@
 ---
 name: your-skill-name
 description: One single line. Say WHAT the skill does and WHEN to use it, and pack in trigger keywords a user would actually type. Third person. Must stay under 1024 characters and must NOT wrap onto a second line or use YAML folded/literal markers.
-version: 0.1
 ---
 
 # Your Skill Name

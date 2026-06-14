@@ -156,6 +156,15 @@ let labels = []; // {el, obj, dim}
 let pickables = [];
 
 function clearScene(){
+  // dispose GPU resources — Three.js does not free geometries/materials on clear(),
+  // and build() runs on every edit, so this prevents a memory leak.
+  nodeGroup.traverse(obj=>{
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material){
+      if (Array.isArray(obj.material)) obj.material.forEach(m=>m.dispose());
+      else obj.material.dispose();
+    }
+  });
   nodeGroup.clear(); labels.forEach(l=>l.el.remove()); labels=[]; pickables=[];
 }
 function mkLabel(text, obj, dim){
@@ -174,7 +183,6 @@ function build(p){
   rooms.forEach((room, ri)=>{
     const ang = rooms.length>1 ? (ri/rooms.length)*Math.PI*2 : 0;
     const rx = Math.cos(ang)*R, rz = Math.sin(ang)*R;
-    const ring = room.ring ?? room.order ?? ri;
     // room plinth
     const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.9,0.5,6),
       surfaceMaterial(room.surface, room.accent));
@@ -205,7 +213,7 @@ function build(p){
           const orb = new THREE.Mesh(new THREE.SphereGeometry(0.42,24,24),
             new THREE.MeshStandardMaterial({ color:0x12151c, roughness:0.25, metalness:0.3,
               emissive:new THREE.Color(room.accent||'#7da3ff'),
-              emissiveIntensity: 0.45 + (li*0.0) }));
+              emissiveIntensity: 0.45 }));
           orb.position.set(sx, 1.7 + li*0.7, sz); nodeGroup.add(orb); pickables.push(orb);
           orb.userData = {kind:'locus', target:loc.target, fact:loc.fact,
             image: loc.image && loc.image.text, station: st.name, due};
@@ -303,7 +311,7 @@ function renderEditTree(){
   };
   const tree = document.getElementById('e-tree'); let h='';
   (palace.rooms||[]).forEach((room,ri)=>{
-    h += `<div class="r">▸ <b>${esc(room.name||room.id)}</b> <a data-r="${ri}" class="aw-s">+station</a></div>`;
+    h += `<div class="r">▸ <b>${esc(room.name||room.id)}</b>${isBlessing ? '' : ` <a data-r="${ri}" class="aw-s">+station</a>`}</div>`;
     if (!isBlessing) (room.stations||[]).forEach((st,si)=>{
       h += `<div class="s">• ${esc(st.name||st.id)} <a data-r="${ri}" data-s="${si}" class="aw-l" style="color:#7da3ff;cursor:pointer">+locus</a></div>`;
       (st.loci||[]).forEach(loc=> h += `<div class="l">– ${esc(loc.target||loc.id)}</div>`);

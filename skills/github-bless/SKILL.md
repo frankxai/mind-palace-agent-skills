@@ -59,6 +59,8 @@ each candidate so the blessing record can cite `commitAtBlessing`.
 
 ## References
 
+- [`references/connectors.md`](references/connectors.md) — rolling a week from git and GitHub (MCP / `gh`),
+  folding in connector signals honestly, and naming every gap (unknown is not zero).
 - Blessing Protocol §3 (ritual inputs) and §4 (record schema): `github.com/frankxai/bless`.
 - Week-roll lineage: the FrankX `scripts/chronicle-roll-week.mjs` auto-roll pattern.
 

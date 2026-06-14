@@ -1,17 +1,15 @@
-name: validate & release
+name: release
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,16 +20,16 @@ jobs:
 
       # Zero-dependency: no pip install step on purpose.
       - name: Validate skills
-        run: python scripts/validate_skills.py
+        run: python3 scripts/validate_skills.py
 
       - name: Check catalog is current
-        run: python scripts/generate_catalog.py --check
+        run: python3 scripts/generate_catalog.py --check
 
       - name: Build distribution zips
-        run: python scripts/build_dist.py
+        run: python3 scripts/build_dist.py
 
-      - name: Upload build artifacts (non-release)
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      - name: Upload build artifacts (manual runs)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: mind-palace-dist

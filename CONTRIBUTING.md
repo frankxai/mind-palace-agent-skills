@@ -1,49 +1,72 @@
 # Contributing
 
-Thanks for improving `mind-palace-agent-skills`. The bar is high and the rules are few.
+This library has two suites: the **Memory Palace** suite (the method of loci, for humans and agents)
+and the **Blessing Protocol** suite ([bless](https://github.com/frankxai/bless)). Contributions are
+welcome — a new skill, a deeper `references/` file, a fix to a loop, or a clearer line. The bar is
+restraint: a skill earns its place by doing one thing whole.
 
-## Authoring a skill
+## The two voices
 
-1. Copy [`template/SKILL.md`](template/SKILL.md) to `skills/<your-skill>/SKILL.md`.
-2. `name` must be lowercase-hyphenated, ≤64 chars, and **match the directory name**.
-3. `description` must be **a single line**, ≤1024 chars, third person, stating *what* the skill
-   does and *when* to use it, with real trigger keywords. Do **not** wrap it onto a second line and
-   do **not** use YAML folded (`>`) or literal (`|`) markers — the zero-dep validator reads one line.
-4. Keep `SKILL.md` under ~500 lines. Push number tables, long recipes, and deep notes into
-   `skills/<your-skill>/references/`. Scripts go in `scripts/`, bundled files in `assets/`.
-5. Register the skill in [`skill-rules.json`](skill-rules.json) — **every** skill directory needs an
-   entry, or validation fails.
+Match the voice of the suite you are touching — never leak one into the other.
 
-## Voice
+- **Memory Palace** — instructional and evidence-grounded. Cite primary literature for empirical
+  claims. **No neuro-myths** (no left/right-brain, "10% of the brain", "photographic memory",
+  "learning styles"). Prefer "render / build out / visualize" over "manifest". See
+  [`spec/MEMORY-PALACE-METHOD.md`](spec/MEMORY-PALACE-METHOD.md) §6.
+- **Blessing** — the witness register. Read
+  [`skills/weekly-blessing/references/voice-register.md`](skills/weekly-blessing/references/voice-register.md).
+  Allowed: witness, ratify, bless, attend, orient, cadence, wholeness, sovereign, restraint, lineage,
+  closure. Refused: manifest, abundance, vibration, energy, resonance, journey, sacred, transformation,
+  awakening — and the AI-slop tells (*delve, unlock, unleash, elevate, dive deep, seamless*). No emoji
+  as ornament.
 
-- Memory Palace suite: instructional, evidence-grounded. Cite primary literature for empirical
-  claims. **No neuro-myths** (no left/right-brain, "10% of brain", "photographic memory",
-  "learning styles"). Prefer "render / build out / visualize" over "manifest".
-- Blessing suite: the Witness register defined by the [Blessing Protocol](https://github.com/frankxai/bless)
-  SPEC §7. Do not leak one suite's voice into the other.
+## Adding a skill
+
+1. Copy [`template/SKILL.md`](template/SKILL.md) to `skills/<name>/SKILL.md`. The directory name and
+   the frontmatter `name` must match.
+2. Write the frontmatter — two fields:
+
+   ```yaml
+   ---
+   name: my-skill
+   description: What the skill does AND when to use it, third person, with explicit trigger phrases. Use when ...
+   ---
+   ```
+
+   - `name` — lowercase, hyphenated, ≤64 chars, matching `^[a-z0-9]+(?:-[a-z0-9]+)*$`, identical to the folder.
+   - `description` — specific, non-empty, ≤1024 chars. Name the triggers; a vague description never activates.
+3. Keep the body surgical (under ~500 lines). Push depth into `skills/<name>/references/*.md`
+   deep-dives (real substance, no padding) and link them from a `## References` section.
+4. If the skill auto-activates, add a rule to [`skill-rules.json`](skill-rules.json). The validator
+   checks both directions: every rule references a real skill, and every skill has a rule.
 
 ## Assets
 
-- Committed images under `assets/` are generated (Higgsfield) and MIT-licensed alongside the repo.
-  Keep them small: textures as WebP, ~1024², well under 100 KB each; few starter scenes.
-- Per-locus images that a user generates for their own palace are theirs, not committed here.
+- The HTML viewer (`assets/palace-viewer/index.html`) is self-contained (procedural textures), so it
+  needs no committed images. Optional high-res textures/scenes are *generated on demand* from
+  [`assets/manifest.json`](assets/manifest.json) — keep any committed images small (WebP, well under
+  100 KB). Per-locus art belongs to the builder, not this library. See
+  [`assets/ASSETS.md`](assets/ASSETS.md).
 
-## Before opening a PR
-
-```bash
-python scripts/validate_skills.py            # must print: OK — N skills valid
-python scripts/generate_catalog.py --check   # CATALOG.md must be up to date
-python scripts/build_dist.py --no-assets     # build must succeed
-```
-
-Regenerate the catalog after adding/renaming/removing a skill:
+## Before you open the PR
 
 ```bash
-python scripts/generate_catalog.py
+python3 scripts/validate_skills.py            # frontmatter + structure + rules consistency
+python3 scripts/generate_catalog.py           # regenerate docs/CATALOG.md + docs/index.html
+python3 scripts/generate_catalog.py --check   # confirm they are in sync (exits 1 on drift)
+python3 scripts/build_dist.py --no-assets     # confirm the kits build
 ```
 
-Open the PR as a **draft** against `main`. CI re-runs all three checks.
+If you added, renamed, or removed a skill or a reference, the catalog **must** be regenerated and
+committed — the `--check` step fails the build otherwise. Open the PR as a **draft** against `main`.
 
-## License
+## What does not get merged
 
-MIT. By contributing you agree your work ships under it.
+- Skills that restate another skill instead of doing one thing whole.
+- Refused-register vocabulary (Blessing) or neuro-myths (Memory Palace).
+- A skill without `references/` depth where the topic clearly has more to say.
+- Generated `docs/` left out of sync with the skills.
+
+---
+
+Built on SIP · Memory Palace Method v0.1 · The Blessing Protocol v0.1 · MIT

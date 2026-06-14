@@ -1,7 +1,6 @@
 ---
 name: palace-walk
 description: Walk the palace from memory to self-test recall, score it, and repair weak loci. Use when the user says "test me on my palace", "let me recall the list", "walk my palace", "quiz me", or after a palace is built or due for review. Runs retrieval practice (the testing effect), marks which loci held and which failed, and updates the recall block of palace.json.
-version: 0.1
 ---
 
 # palace-walk

@@ -1,7 +1,6 @@
 ---
 name: number-memory
 description: Memorize digits, dates, phone numbers, and playing cards by converting numbers into images. Use when the user says "memorize this number", "remember these dates", "how do I memorize a deck of cards", "PAO system", "Major System", or "Dominic System". Supplies the encoding for numeric targets, then hands the resulting images to loci-encoder for placement.
-version: 0.1
 ---
 
 # number-memory

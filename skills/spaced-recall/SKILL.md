@@ -1,7 +1,6 @@
 ---
 name: spaced-recall
 description: Schedule spaced repetition over a memory palace so it lasts, and export to Anki. Use when the user says "spaced repetition", "when should I review", "schedule my reviews", "keep this long-term", "export to Anki", "FSRS", or "SM-2". Computes next-due dates from palace-walk grades, writes the recall block of palace.json, and drives durable retention against the forgetting curve.
-version: 0.1
 ---
 
 # spaced-recall

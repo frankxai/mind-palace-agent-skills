@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mind-palace-agent-skills — 13 memory-palace agent skills</title>
+<meta name="description" content="A science-grounded memory-palace skill suite (the method of loci, for humans and AI agents) plus the Blessing Protocol — 13 portable agent skills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#09090b; --panel:#0f0f12; --panel2:#141418; --line:rgba(255,255,255,.08);
+    --ink:#ecedf1; --muted:#9aa1ad; --gold:#f4c97a; --violet:#c9b6ff;
+    --sans:'Geist','Segoe UI',system-ui,-apple-system,sans-serif;
+    --mono:'Geist Mono','SFMono-Regular',ui-monospace,Menlo,monospace;
+    --serif:'Instrument Serif',Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans);
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--gold);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:960px;margin:0 auto;padding:64px 22px 96px}
+  header{text-align:center;margin-bottom:40px}
+  .mark{font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--muted)}
+  h1{font-family:var(--serif);font-weight:400;font-size:46px;line-height:1.05;margin:14px 0 10px;letter-spacing:-.01em}
+  h1 .g{color:var(--gold)} h1 .v{color:var(--violet)}
+  .tag{color:var(--muted);font-size:18px;margin:0 auto 22px;max-width:600px}
+  .pills{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:5px 13px;color:var(--muted);font-size:13px}
+  .pill b{color:var(--ink);font-weight:600}
+  .loop{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;
+    margin:30px 0 8px;color:var(--muted);font-family:var(--mono);font-size:13.5px}
+  .loop b{color:var(--gold);font-weight:500}
+  .loop .sep{color:var(--line)}
+  .suite{grid-column:1/-1;font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--violet);margin:26px 0 2px;padding-bottom:6px;
+    border-bottom:1px solid var(--line)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;margin-top:24px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px;
+    transition:border-color .16s,transform .16s}
+  .card:hover{border-color:rgba(244,201,122,.4);transform:translateY(-2px)}
+  .step{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);
+    display:inline-block;margin-bottom:9px}
+  .card h3{margin:0 0 9px;font-size:18px}
+  .card h3 a{font-family:var(--mono);font-size:17px;color:var(--ink)}
+  .card h3 a:hover{color:var(--gold)}
+  .card p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.58}
+  .refs{margin-top:14px;padding-top:13px;border-top:1px solid var(--line)}
+  .refs .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+    display:block;margin-bottom:7px}
+  .refs a{display:inline-block;font-family:var(--mono);font-size:12.5px;color:var(--gold);
+    border:1px solid var(--line);border-radius:8px;padding:3px 9px;margin:0 6px 6px 0}
+  .refs a:hover{border-color:rgba(244,201,122,.5);text-decoration:none}
+  footer{text-align:center;color:var(--muted);margin-top:52px;font-size:13.5px}
+  footer .hair{width:48px;height:1px;background:var(--line);margin:0 auto 20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark">mind-palace-agent-skills</div>
+    <h1>Build a <span class="g">mind palace</span><br>with an <span class="v">agent</span>.</h1>
+    <p class="tag">The method of loci for humans and AI agents — design, encode, recall, schedule, render. Plus the Blessing Protocol. 13 self-contained, runtime-agnostic, MIT skills.</p>
+    <div class="pills">
+      <span class="pill"><b>13</b> skills</span>
+      <span class="pill">Memory Palace</span>
+      <span class="pill">Blessing Protocol v0.1</span>
+      <span class="pill">MIT</span>
+      <span class="pill"><a href="https://github.com/frankxai/mind-palace-agent-skills">GitHub</a></span>
+    </div>
+    <div class="loop">
+      <b>/memorize</b><span class="sep">→</span><b>/recall</b><span class="sep">·</span><b>/sunday</b><span class="sep">→</span>ingest<span class="sep">→</span>witness<span class="sep">→</span>grow
+    </div>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer>
+    <div class="hair"></div>
+    Built on SIP · Memory Palace Method v0.1 · The Blessing Protocol v0.1 ·
+    <a href="https://github.com/frankxai/bless">bless</a>
+  </footer>
+</div>
+<script id="data" type="application/json">[{"name":"palace-foundations","description":"Teach the method of loci and route the user to the right memory-palace skill. Use when someone says \"teach me the memory palace\", \"how does the method of loci work\", \"help me memorize X\", \"I want to remember a list/speech/deck\", or is new to spatial memory. The start-here skill that explains the four-level model then dispatches to architect, encoder, number-memory, walk, or spaced-recall.","step":"start here","suite":"Memory Palace","path":"skills/palace-foundations/SKILL.md","dir":"palace-foundations","refs":[]},{"name":"memory-palace-architect","description":"Design a memory palace — choose a real or imagined locus, lay a fixed non-crossing route, and space the stations. Use when the user says \"design a memory palace\", \"pick a place to memorize in\", \"lay out my palace\", \"map a route for N items\", or needs a structure before encoding. Writes the rooms/stations skeleton of palace.json for loci-encoder to fill.","step":"design","suite":"Memory Palace","path":"skills/memory-palace-architect/SKILL.md","dir":"memory-palace-architect","refs":[]},{"name":"loci-encoder","description":"Turn each target into a vivid, memorable image and place it at a station. Use when the user says \"encode these items\", \"make images for my palace\", \"help me remember names and faces\", \"turn this list into pictures\", or after memory-palace-architect lays out the rooms. Applies bizarreness, multisensory, exaggeration, motion, and dual-coding; fills the loci[] of palace.json.","step":"encode","suite":"Memory Palace","path":"skills/loci-encoder/SKILL.md","dir":"loci-encoder","refs":["names-faces.md"]},{"name":"number-memory","description":"Memorize digits, dates, phone numbers, and playing cards by converting numbers into images. Use when the user says \"memorize this number\", \"remember these dates\", \"how do I memorize a deck of cards\", \"PAO system\", \"Major System\", or \"Dominic System\". Supplies the encoding for numeric targets, then hands the resulting images to loci-encoder for placement.","step":"encode","suite":"Memory Palace","path":"skills/number-memory/SKILL.md","dir":"number-memory","refs":["major-system.md","pao.md"]},{"name":"palace-walk","description":"Walk the palace from memory to self-test recall, score it, and repair weak loci. Use when the user says \"test me on my palace\", \"let me recall the list\", \"walk my palace\", \"quiz me\", or after a palace is built or due for review. Runs retrieval practice (the testing effect), marks which loci held and which failed, and updates the recall block of palace.json.","step":"retrieve","suite":"Memory Palace","path":"skills/palace-walk/SKILL.md","dir":"palace-walk","refs":[]},{"name":"spaced-recall","description":"Schedule spaced repetition over a memory palace so it lasts, and export to Anki. Use when the user says \"spaced repetition\", \"when should I review\", \"schedule my reviews\", \"keep this long-term\", \"export to Anki\", \"FSRS\", or \"SM-2\". Computes next-due dates from palace-walk grades, writes the recall block of palace.json, and drives durable retention against the forgetting curve.","step":"schedule","suite":"Memory Palace","path":"skills/spaced-recall/SKILL.md","dir":"spaced-recall","refs":["anki-export.md"]},{"name":"imagination-gym","description":"Train mental-imagery vividness and scene construction so memory-palace images are stronger. Use when the user says \"my mental pictures are weak/blurry\", \"I can't visualize\", \"train my imagination\", \"help me see images more clearly\", or struggles to encode loci. Drills based on imagery research — multisensory detail, manipulation, and scene construction — to make encoding work better.","step":"train","suite":"Memory Palace","path":"skills/imagination-gym/SKILL.md","dir":"imagination-gym","refs":[]},{"name":"agent-memory-palace","description":"Give an AI agent persistent, navigable memory across sessions using a memory-palace structure. Use when building agent memory, when the user says \"remember this across sessions\", \"give the agent long-term memory\", \"persistent context\", \"knowledge graph for my agent\", or for coding agents, Claude cowork, and ChatGPT projects that must retain state. Reads and writes palace.json as a durable spatial knowledge store the agent reloads each session.","step":"for agents","suite":"Memory Palace","path":"skills/agent-memory-palace/SKILL.md","dir":"agent-memory-palace","refs":[]},{"name":"palace-visualizer","description":"Render a memory palace as a navigable artifact — a self-contained HTML viewer plus image-generation prompts for each locus. Use when the user says \"render my palace\", \"visualize the palace\", \"make a picture of my memory palace\", \"build out the palace\", or wants a keepable visual. Reads palace.json, emits a standalone index.html (no build step) and per-locus image prompts; tolerates both memory-palace and blessing schemas.","step":"render","suite":"Memory Palace","path":"skills/palace-visualizer/SKILL.md","dir":"palace-visualizer","refs":[]},{"name":"github-bless","description":"Ingest a builder's GitHub (and optional connectors) and roll the week's work into a blessable set. Use when starting a weekly blessing, when the user says \"what did I ship this week\", \"roll my week\", \"ingest my repos for the blessing\", or before running the weekly-blessing skill. Reads commits and merged PRs across repos and emits a structured candidate list — it does not bless anything itself.","step":"ingest","suite":"Blessing","path":"skills/github-bless/SKILL.md","dir":"github-bless","refs":["connectors.md"]},{"name":"weekly-blessing","description":"Run the weekly Sunday blessing ritual on a builder's work — witness what shipped, ratify what is whole, name what to ignore for seven days, and surface the one path forward. Use when the user says \"run the weekly blessing\", \"do my Sunday review\", \"bless this week\", or invokes /sunday or /bless. Writes weekly/YYYY-W##.md and appends to the blessing ledger. Invoked, never auto-fired.","step":"witness","suite":"Blessing","path":"skills/weekly-blessing/SKILL.md","dir":"weekly-blessing","refs":["voice-register.md"]},{"name":"palace-build","description":"Turn a builder's blessing ledger into a palace — emit palace/rooms.json for a React/Three.js renderer and a portable standalone HTML palace that works with no build step. Use when the user says \"build my palace\", \"render the palace\", \"regenerate rooms.json\", or after a weekly blessing adds new rooms. Reads blessings.jsonl + palace.md; writes rooms.json and an optional self-contained index.html.","step":"grow","suite":"Blessing","path":"skills/palace-build/SKILL.md","dir":"palace-build","refs":["3d-craft.md"]},{"name":"blessing-standard","description":"Scaffold the five Blessing Protocol files (soul.md, agent.md, skills.md, palace.md, bless.md) into any repository and fill them from what the repo already is. Use when the user says \"adopt bless here\", \"make this repo blessable\", \"scaffold the blessing files\", \"set up the mind palace standard\". Reads the repo to draft soul.md first, then derives the rest; never overwrites a filled file without asking.","step":"onboard","suite":"Blessing","path":"skills/blessing-standard/SKILL.md","dir":"blessing-standard","refs":[]}]</script>
+<script>
+  const REPO = 'https://github.com/frankxai/mind-palace-agent-skills/blob/main/';
+  const SKILLS = JSON.parse(document.getElementById('data').textContent);
+  const esc = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+  let lastSuite = null;
+  document.getElementById('grid').innerHTML = SKILLS.map(s => {
+    let head = '';
+    if (s.suite !== lastSuite) { head = '<h2 class="suite">' + esc(s.suite) + ' suite</h2>'; lastSuite = s.suite; }
+    const refs = (s.refs || []).map(r =>
+      '<a href="' + REPO + 'skills/' + s.dir + '/references/' + r + '">' + esc(r) + '</a>').join('');
+    return head + '<div class="card">' +
+      (s.step ? '<span class="step">' + esc(s.step) + '</span>' : '') +
+      '<h3><a href="' + REPO + s.path + '">' + esc(s.name) + '</a></h3>' +
+      '<p>' + esc(s.description) + '</p>' +
+      (refs ? '<div class="refs"><span class="lbl">References</span>' + refs + '</div>' : '') +
+      '</div>';
+  }).join('');
+</script>
+</body>
+</html>

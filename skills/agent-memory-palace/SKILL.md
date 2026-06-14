@@ -1,7 +1,6 @@
 ---
 name: agent-memory-palace
 description: Give an AI agent persistent, navigable memory across sessions using a memory-palace structure. Use when building agent memory, when the user says "remember this across sessions", "give the agent long-term memory", "persistent context", "knowledge graph for my agent", or for coding agents, Claude cowork, and ChatGPT projects that must retain state. Reads and writes palace.json as a durable spatial knowledge store the agent reloads each session.
-version: 0.1
 ---
 
 # agent-memory-palace

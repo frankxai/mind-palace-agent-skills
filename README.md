@@ -1,34 +1,30 @@
+<div align="center">
+
+<img src=".github/hero.svg" alt="mind-palace-agent-skills — build a mind palace with an agent" width="100%" />
+
 # mind-palace-agent-skills
 
-Build a **mind palace** with an agent — the real, science-backed kind. Portable skills that teach and
-operate the **method of loci** for both **human learners** and **AI agents**: design a palace, encode
-vivid images, walk it to self-test, schedule spaced review, and render it as a navigable artifact.
+### Build a **mind palace** with an agent — the real, science-grounded kind
 
-Plus the **Blessing Protocol** suite — witness your week's work and grow a palace from what is whole.
+> The **method of loci** for both **human learners** and **AI agents**: design a palace, encode vivid
+> images, walk it to self-test, schedule spaced review, render it as a navigable artifact. Plus the
+> **Blessing Protocol** suite — witness your week's work and grow a palace from what is whole.
+> Self-contained `SKILL.md` skills for Claude Code, Claude.ai, ChatGPT, Cursor, Codex, Gemini.
 
-Two suites, 13 skills, one library. Works in any runtime that reads `SKILL.md` (Claude Code,
-Claude.ai, ChatGPT, Cursor, Codex, Gemini). Grounded in cognitive-science primary literature — no
-neuro-myths. See [`spec/MEMORY-PALACE-METHOD.md`](spec/MEMORY-PALACE-METHOD.md).
+[![License: MIT](https://img.shields.io/badge/License-MIT-f4c97a.svg)](LICENSE)
+[![Built on SIP](https://img.shields.io/badge/Built%20on-SIP-c9b6ff.svg)](https://github.com/frankxai/Starlight-Intelligence-System)
+[![Blessing Protocol](https://img.shields.io/badge/Blessing%20Protocol-v0.1-f4c97a.svg)](https://github.com/frankxai/bless)
+[![Skills](https://img.shields.io/badge/skills-13-f4c97a.svg)](docs/CATALOG.md)
+[![Validate](https://github.com/frankxai/mind-palace-agent-skills/actions/workflows/validate.yml/badge.svg)](https://github.com/frankxai/mind-palace-agent-skills/actions/workflows/validate.yml)
 
-## Quick start
+[**Memory Palace**](#the-memory-palace-suite) · [**Blessing**](#the-blessing-suite) · [**Install**](#install) · [**Catalog**](docs/CATALOG.md) · [**Contribute**](CONTRIBUTING.md)
 
-**Download the kit** — grab a zip from the latest [release](../../releases) (`mind-palace-skills.zip`,
-or a per-platform kit), unzip, and follow its `INSTALL.md`.
+</div>
 
-**Claude Code (plugin)**
-```
-/plugin marketplace add frankxai/mind-palace-agent-skills
-```
+---
 
-**Clone & copy**
-```bash
-git clone https://github.com/frankxai/mind-palace-agent-skills
-cp -r mind-palace-agent-skills/skills/*    ~/.claude/skills/
-cp -r mind-palace-agent-skills/commands/*  ~/.claude/commands/
-```
-
-**Other runtimes** — see [`MULTI_RUNTIME.md`](MULTI_RUNTIME.md). `SKILL.md` is universal; only the
-install path differs.
+Two suites, 13 skills, one library. Grounded in cognitive-science primary literature — no neuro-myths.
+See [`spec/MEMORY-PALACE-METHOD.md`](spec/MEMORY-PALACE-METHOD.md).
 
 ## The Memory Palace suite
 
@@ -48,9 +44,8 @@ Commands: `/memorize <target>` · `/recall` · `/palace-new`. The shared data sh
 [`palace.json`](spec/palace.schema.json).
 
 **See it:** open [`assets/palace-viewer/index.html`](assets/palace-viewer/index.html) — a
-self-contained 3D viewer + builder. It loads the example at
-[`spec/examples/solar-system.palace.json`](spec/examples/solar-system.palace.json), or drag in your
-own.
+self-contained 3D viewer + builder. It loads the example
+[`spec/examples/solar-system.palace.json`](spec/examples/solar-system.palace.json), or drag in your own.
 
 ## The Blessing suite
 
@@ -62,20 +57,46 @@ own.
 | [`blessing-standard`](skills/blessing-standard/SKILL.md) | onboard | Scaffold the five Blessing files into any repo. |
 
 Commands: `/sunday` · `/bless <slug>` · `/palace`. The standard:
-[`frankxai/bless`](https://github.com/frankxai/bless).
+[`frankxai/bless`](https://github.com/frankxai/bless). Each blessing skill carries a `references/`
+deep-dive — the [voice register](skills/weekly-blessing/references/voice-register.md),
+[3D craft](skills/palace-build/references/3d-craft.md),
+[connectors](skills/github-bless/references/connectors.md).
 
-> Full catalog: [`docs/CATALOG.md`](docs/CATALOG.md) · Connectors: [`CONNECTORS.md`](CONNECTORS.md).
+## Install
+
+**Download a kit** — grab a zip from the latest [release](../../releases)
+(`mind-palace-skills.zip`, or a per-platform kit), unzip, follow its `INSTALL.md`.
+
+**Claude Code (plugin)** — `/plugin marketplace add frankxai/mind-palace-agent-skills`
+
+**Clone & copy**
+```bash
+git clone https://github.com/frankxai/mind-palace-agent-skills
+cp -r mind-palace-agent-skills/skills/*    ~/.claude/skills/
+cp -r mind-palace-agent-skills/commands/*  ~/.claude/commands/
+```
+
+Other runtimes (ChatGPT, Cursor, Codex, Gemini): see [`MULTI_RUNTIME.md`](MULTI_RUNTIME.md). `SKILL.md`
+is universal; only the install path differs.
 
 ## Build & validate
 
 ```bash
-python scripts/validate_skills.py            # frontmatter + rules consistency
-python scripts/generate_catalog.py           # regenerate docs/CATALOG.md
-python scripts/build_dist.py                 # build dist/ zips (use --no-assets for lean)
+python3 scripts/validate_skills.py            # frontmatter + structure + rules
+python3 scripts/generate_catalog.py           # regenerate docs/CATALOG.md + docs/index.html
+python3 scripts/generate_catalog.py --check   # confirm catalog + Pages index are in sync
+python3 scripts/build_dist.py                 # build dist/ zips (use --no-assets for lean)
 ```
 
-## License
+A browsable catalog is generated to [`docs/`](docs/CATALOG.md) and served via GitHub Pages.
 
-MIT. See [`LICENSE`](LICENSE).
+## The Blessing family
 
-Built on SIP · Memory Palace Method v0.1 · The Blessing Protocol v0.1
+| Repo | Role |
+|---|---|
+| [**bless**](https://github.com/frankxai/bless) | The open standard — the Blessing Protocol |
+| [**mind-palace-agent-skills**](https://github.com/frankxai/mind-palace-agent-skills) | Portable agent skills — Memory Palace + Blessing |
+| [**frankx-mind-palace**](https://github.com/frankxai/frankx-mind-palace) | The mind — Frank's blessed work as data |
+| [**frankx-palace**](https://github.com/frankxai/frankx-palace) | The palace — the 3D memory palace that grows each Sunday |
+
+<sub>Built on SIP · Memory Palace Method v0.1 · The Blessing Protocol v0.1 · MIT</sub>

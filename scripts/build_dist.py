@@ -83,7 +83,8 @@ def iter_files(rel_root: str, no_assets: bool):
             continue
         if no_assets and path.relative_to(ROOT).parts[0] == "assets":
             continue
-        yield path, str(path.relative_to(ROOT))
+        # as_posix() so zip entries use forward slashes on every platform (incl. Windows)
+        yield path, path.relative_to(ROOT).as_posix()
 
 
 def write_zip(zip_path: Path, includes: list[str], no_assets: bool, extra: dict[str, str] | None = None) -> tuple[int, int]:
@@ -120,7 +121,10 @@ def main() -> int:
 
     if DIST.exists():
         import shutil
-        shutil.rmtree(DIST)
+        if DIST.is_dir():
+            shutil.rmtree(DIST)
+        else:
+            DIST.unlink()
 
     built: list[tuple[str, int, int]] = []
 

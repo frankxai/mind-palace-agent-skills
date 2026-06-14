@@ -1,7 +1,6 @@
 ---
 name: imagination-gym
 description: Train mental-imagery vividness and scene construction so memory-palace images are stronger. Use when the user says "my mental pictures are weak/blurry", "I can't visualize", "train my imagination", "help me see images more clearly", or struggles to encode loci. Drills based on imagery research — multisensory detail, manipulation, and scene construction — to make encoding work better.
-version: 0.1
 ---
 
 # imagination-gym
