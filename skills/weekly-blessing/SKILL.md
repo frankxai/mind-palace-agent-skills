@@ -67,6 +67,8 @@ After filing, `palace-build` can regenerate the palace from the updated ledger +
 
 ## References
 
+- [`references/voice-register.md`](references/voice-register.md) — the allowed/refused vocabulary and why,
+  plus the six-section structure expanded with a worked micro-example.
 - Blessing Protocol §3 (output structure), §3.3 (blessing definition), §3.4 (refusals), §7 (voice):
   `github.com/frankxai/bless`.
 - Lineage: the FrankX `starlight-chronicle` skill (the private reference implementation).

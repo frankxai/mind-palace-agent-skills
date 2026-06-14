@@ -59,9 +59,11 @@ a portable standalone `index.html` (so a builder gets a palace even with no tool
 
 ## References
 
+- [`references/3d-craft.md`](references/3d-craft.md) — one key + one rim, selective bloom, legible glass
+  (`thickness ~0.25`, `chromaticAberration ~0.02`), camera motion as half the premium, frame-locked reveals,
+  artifact-first naming. Distilled from the Starlight 3D-memory-palace survey.
 - Blessing Protocol §5 (room schema): `github.com/frankxai/bless`.
 - Renderer: `github.com/frankxai/frankx-palace` (Next.js + react-three-fiber reference).
-- 3D craft: the Starlight 3D-memory-palace survey (one light, selective bloom, legible glass).
 
 ---
 

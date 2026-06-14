@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: The Blessing Protocol
+    url: https://github.com/frankxai/bless
+    about: The standard these skills implement.
+  - name: Reference adoption
+    url: https://github.com/frankxai/frankx-mind-palace
+    about: A worked example of the practice.
+  - name: frankx.ai
+    url: https://frankx.ai
+    about: Frank's hub.
