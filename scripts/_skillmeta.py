@@ -41,6 +41,7 @@ def parse_frontmatter(text: str) -> dict | None:
         key, val = km.group(1), km.group(2).strip()
         if val in _BLOCK_INDICATORS:
             block: list[str] = []
+            indent = None
             i += 1
             while i < len(lines):
                 nxt = lines[i]
@@ -48,9 +49,13 @@ def parse_frontmatter(text: str) -> dict | None:
                     block.append("")
                     i += 1
                     continue
-                if len(nxt) - len(nxt.lstrip()) == 0:  # dedent ends the block
+                line_indent = len(nxt) - len(nxt.lstrip())
+                if line_indent == 0:  # dedent ends the block
                     break
-                block.append(nxt.strip())
+                if indent is None:
+                    indent = line_indent
+                # strip only the block's base indent, preserving relative nesting
+                block.append(nxt[indent:].rstrip() if nxt.startswith(" " * indent) else nxt.strip())
                 i += 1
             joiner = "\n" if val.startswith("|") else " "
             fm[key] = joiner.join(block).strip()
