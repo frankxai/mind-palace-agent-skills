@@ -75,3 +75,17 @@ A browsable catalog is generated to [`docs/`](docs/CATALOG.md) and served via Gi
 | [**frankx-palace**](https://github.com/frankxai/frankx-palace) | The palace — the 3D memory palace that grows each Sunday |
 
 <sub>Built on SIP · The Blessing Protocol v0.1 · MIT</sub>
+
+## Part of the Mind Intelligence ecosystem
+
+The memory-palace family is the reflection-practice sibling of the wider
+[Mind Intelligence Systems](https://github.com/frankxai/mind-intelligence-systems) swarm —
+where the cognitive family *models* the mind, the palace family *witnesses and keeps* what is
+whole. Start from the [curated map](https://github.com/frankxai/awesome-mind-agent-skills).
+
+| Family | What it does | Entry point |
+|---|---|---|
+| canon | naming · models · mesh | [mind-intelligence-systems](https://github.com/frankxai/mind-intelligence-systems) |
+| cognitive · lived OS | model → schemas → personal OS | [agentic-mind-os](https://github.com/frankxai/agentic-mind-os) |
+| memory palace | witness & keep finished work | [mind-palace-agent-skills](https://github.com/frankxai/mind-palace-agent-skills) |
+| discovery | the front door | [awesome-mind-agent-skills](https://github.com/frankxai/awesome-mind-agent-skills) |
