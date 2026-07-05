@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Palace Viewer — mind-palace-agent-skills</title>
+<!--
+  Standalone memory-palace viewer + builder. No build step.
+  - Loads palace.json: inline (window.PALACE_DATA), ?src=URL, or drag-and-drop.
+  - Branches on `type`: "memory-palace" (nested rooms->stations->loci) or "blessing" (flat rooms).
+  - Craft: one warm key + one cool rim + low ambient, dark bg, emissive accents, damped camera,
+    prefers-reduced-motion disables idle drift. Surfaces map to ../textures/<surface>.webp with
+    a flat-accent fallback so a lone copy of this file still renders.
+  - Edit panel: add/rename rooms, stations, loci; export the edited palace.json.
+-->
+<style>
+  :root { --bg:#09090b; --fg:#e7e7ea; --muted:#9aa0aa; --panel:rgba(20,20,24,.82); --line:rgba(255,255,255,.08); }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; overflow:hidden; }
+  #c { position:fixed; inset:0; display:block; }
+  #labels { position:fixed; inset:0; pointer-events:none; }
+  .label { position:absolute; transform:translate(-50%,-130%); white-space:nowrap;
+    padding:2px 8px; border-radius:6px; background:rgba(9,9,11,.7); border:1px solid var(--line);
+    color:var(--fg); font-size:12px; letter-spacing:.2px; opacity:.85; }
+  .label.dim { opacity:.35; font-size:11px; }
+  #hud { position:fixed; top:16px; left:16px; max-width:min(360px,46vw); padding:14px 16px;
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; backdrop-filter:blur(8px); }
+  #hud h1 { margin:0 0 2px; font-size:15px; font-weight:600; }
+  #hud .sub { color:var(--muted); font-size:12px; }
+  #hud .meta { margin-top:8px; color:var(--muted); font-size:12px; }
+  #detail { margin-top:10px; padding-top:10px; border-top:1px solid var(--line); display:none; }
+  #detail .t { font-weight:600; } #detail .f { color:var(--muted); font-size:12px; margin-top:2px; }
+  #detail .img { margin-top:6px; font-size:12px; color:#cdd3dd; }
+  #drop { position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+    background:rgba(9,9,11,.7); border:2px dashed rgba(125,163,255,.6); z-index:5; font-size:16px; color:#cdd3dd; }
+  #bar { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:8px;
+    padding:8px; background:var(--panel); border:1px solid var(--line); border-radius:12px; backdrop-filter:blur(8px); }
+  button { font:inherit; color:var(--fg); background:rgba(255,255,255,.06); border:1px solid var(--line);
+    padding:6px 12px; border-radius:8px; cursor:pointer; } button:hover { background:rgba(255,255,255,.12); }
+  #edit { position:fixed; top:16px; right:16px; width:min(330px,46vw); max-height:calc(100vh - 32px); overflow:auto;
+    padding:14px 16px; background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    backdrop-filter:blur(8px); display:none; }
+  #edit h2 { margin:0 0 8px; font-size:13px; } #edit .row { margin:6px 0; }
+  #edit input, #edit select, #edit textarea { width:100%; font:inherit; color:var(--fg);
+    background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:6px; padding:5px 8px; }
+  #edit label { display:block; color:var(--muted); font-size:11px; margin-bottom:2px; }
+  #edit .tree { margin-top:8px; border-top:1px solid var(--line); padding-top:8px; font-size:12px; }
+  #edit .tree .r { color:#cdd3dd; margin-top:6px; } #edit .tree .s { color:var(--muted); margin-left:10px; }
+  #edit .tree .l { margin-left:20px; } #edit .tree .l a { color:#7da3ff; cursor:pointer; text-decoration:none; }
+  .hint { color:var(--muted); font-size:11px; margin-top:4px; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="hud">
+  <h1 id="title">Palace</h1>
+  <div class="sub" id="subtitle"></div>
+  <div class="meta" id="meta"></div>
+  <div id="detail"><div class="t" id="d-t"></div><div class="f" id="d-f"></div><div class="img" id="d-img"></div></div>
+</div>
+<div id="edit"></div>
+<div id="bar">
+  <button id="btn-edit">Edit</button>
+  <button id="btn-open">Open JSON</button>
+  <button id="btn-export">Export palace.json</button>
+  <button id="btn-motion">Pause drift</button>
+</div>
+<div id="drop">Drop a palace.json or rooms.json to load it</div>
+<input id="file" type="file" accept="application/json,.json" hidden />
+
+<!-- Inline default so the file works offline on its own. Replace via Open/drop/?src=. -->
+<script id="palace-data" type="application/json">
+{ "type":"memory-palace","version":"0.1","id":"demo","title":"Demo Palace",
+  "rooms":[{"id":"hall","name":"The Hall","surface":"marble","accent":"#ffcf6b",
+    "stations":[{"id":"door","name":"Front door","loci":[
+      {"id":"a","target":"First item","image":{"text":"A vivid, strange image on the door."}}]}]}]}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let idleDrift = !reduceMotion;
+
+const SURFACES = {
+  obsidian:{color:0x14161c,rough:0.35,metal:0.4}, slate:{color:0x2b303a,rough:0.7,metal:0.1},
+  bronze:{color:0x5c4326,rough:0.45,metal:0.8}, marble:{color:0xd8d2c4,rough:0.5,metal:0.05},
+  glass:{color:0x2a3550,rough:0.1,metal:0.0}, aurora:{color:0x1d3a44,rough:0.3,metal:0.2}
+};
+const texLoader = new THREE.TextureLoader();
+// Procedural texture so the file is fully self-contained — no asset downloads required.
+// If a high-res ../textures/<surface>.webp exists (see assets/ASSETS.md), it is used instead.
+const texCache = {};
+function proceduralTexture(surface){
+  if (texCache[surface]) return texCache[surface];
+  const s = SURFACES[surface] || {color:0x222831};
+  const cv = document.createElement('canvas'); cv.width = cv.height = 256;
+  const ctx = cv.getContext('2d');
+  const base = new THREE.Color(s.color);
+  ctx.fillStyle = `rgb(${base.r*255|0},${base.g*255|0},${base.b*255|0})`;
+  ctx.fillRect(0,0,256,256);
+  // subtle multi-octave noise for material grain
+  const img = ctx.getImageData(0,0,256,256), d = img.data;
+  for (let i=0;i<d.length;i+=4){ const n=(Math.random()-0.5)*26; d[i]+=n; d[i+1]+=n; d[i+2]+=n; }
+  ctx.putImageData(img,0,0);
+  // a faint sweep so flat planes read as a surface, not a swatch
+  const g = ctx.createLinearGradient(0,0,256,256);
+  g.addColorStop(0,'rgba(255,255,255,0.06)'); g.addColorStop(1,'rgba(0,0,0,0.10)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,256,256);
+  const t = new THREE.CanvasTexture(cv); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(2,2);
+  texCache[surface]=t; return t;
+}
+function surfaceMaterial(surface, accent){
+  const s = SURFACES[surface] || {color:0x222831,rough:0.5,metal:0.2};
+  const m = new THREE.MeshStandardMaterial({ color:s.color, roughness:s.rough, metalness:s.metal,
+    map: proceduralTexture(surface) });
+  // upgrade to a real high-res texture if one was generated and shipped
+  texLoader.load(`../textures/${surface}.webp`,
+    t=>{ t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(2,2); m.map=t; m.needsUpdate=true; },
+    undefined, ()=>{});
+  if (accent){ m.emissive = new THREE.Color(accent); m.emissiveIntensity = 0.0; }
+  return m;
+}
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x09090b);
+scene.fog = new THREE.Fog(0x09090b, 22, 60);
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(0, 9, 18);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.maxPolarAngle = Math.PI*0.49; controls.minDistance = 6; controls.maxDistance = 48;
+
+// one warm key + one cool rim + low ambient — never five lights
+const key = new THREE.DirectionalLight(0xffe5cc, 2.1); key.position.set(8,14,6); scene.add(key);
+const rim = new THREE.DirectionalLight(0x7da3ff, 0.9); rim.position.set(-10,6,-8); scene.add(rim);
+scene.add(new THREE.AmbientLight(0x404654, 0.35));
+// ground
+const ground = new THREE.Mesh(new THREE.CircleGeometry(60,64),
+  new THREE.MeshStandardMaterial({ color:0x0c0d11, roughness:1 }));
+ground.rotation.x = -Math.PI/2; ground.position.y = -0.01; scene.add(ground);
+
+const labelLayer = document.getElementById('labels');
+let palace = null, nodeGroup = new THREE.Group(); scene.add(nodeGroup);
+let labels = []; // {el, obj, dim}
+let pickables = [];
+
+function clearScene(){
+  // dispose GPU resources — Three.js does not free geometries/materials on clear(),
+  // and build() runs on every edit, so this prevents a memory leak.
+  nodeGroup.traverse(obj=>{
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material){
+      if (Array.isArray(obj.material)) obj.material.forEach(m=>m.dispose());
+      else obj.material.dispose();
+    }
+  });
+  nodeGroup.clear(); labels.forEach(l=>l.el.remove()); labels=[]; pickables=[];
+}
+function mkLabel(text, obj, dim){
+  const el = document.createElement('div'); el.className='label'+(dim?' dim':''); el.textContent=text;
+  labelLayer.appendChild(el); labels.push({el,obj,dim});
+}
+
+function build(p){
+  clearScene(); palace = p;
+  const isBlessing = p.type === 'blessing' || (!p.type && Array.isArray(p.rooms) && p.rooms[0] && !p.rooms[0].stations);
+  document.getElementById('title').textContent = p.title || p.owner || 'Palace';
+  document.getElementById('subtitle').textContent = isBlessing ? 'blessing palace · rooms.json' : 'memory palace · method of loci';
+  const rooms = p.rooms || [];
+  let lociCount = 0, stationCount = 0;
+  const R = Math.max(6, rooms.length * 2.2);
+  rooms.forEach((room, ri)=>{
+    const ang = rooms.length>1 ? (ri/rooms.length)*Math.PI*2 : 0;
+    const rx = Math.cos(ang)*R, rz = Math.sin(ang)*R;
+    // room plinth
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.9,0.5,6),
+      surfaceMaterial(room.surface, room.accent));
+    plinth.position.set(rx, 0.25, rz); nodeGroup.add(plinth);
+    plinth.userData = {kind:'room', truth: room.truth, name: room.name};
+    pickables.push(plinth);
+    mkLabel(room.name || room.id || `Room ${ri+1}`, plinth, false);
+    if (isBlessing){
+      // flat: one orb per room carrying its truth
+      const orb = new THREE.Mesh(new THREE.SphereGeometry(0.7,32,32),
+        new THREE.MeshStandardMaterial({ color:0x1a1d24, roughness:0.25, metalness:0.3,
+          emissive:new THREE.Color(room.accent||'#7da3ff'), emissiveIntensity:0.6 }));
+      orb.position.set(rx, 1.6, rz); nodeGroup.add(orb); pickables.push(orb);
+      orb.userData = {kind:'locus', target: room.name, fact: room.truth, image:null};
+      lociCount++;
+    } else {
+      const stations = room.stations || [];
+      stations.forEach((st, si)=>{
+        stationCount++;
+        const sa = (si/Math.max(stations.length,1))*Math.PI*2;
+        const sx = rx + Math.cos(sa)*1.0, sz = rz + Math.sin(sa)*1.0;
+        const post = new THREE.Mesh(new THREE.BoxGeometry(0.25,1.0,0.25),
+          new THREE.MeshStandardMaterial({color:0x2a2f3a,roughness:0.6}));
+        post.position.set(sx,1.0,sz); nodeGroup.add(post);
+        (st.loci||[]).forEach((loc, li)=>{
+          lociCount++;
+          const due = loc.recall && loc.recall.due;
+          const orb = new THREE.Mesh(new THREE.SphereGeometry(0.42,24,24),
+            new THREE.MeshStandardMaterial({ color:0x12151c, roughness:0.25, metalness:0.3,
+              emissive:new THREE.Color(room.accent||'#7da3ff'),
+              emissiveIntensity: 0.45 }));
+          orb.position.set(sx, 1.7 + li*0.7, sz); nodeGroup.add(orb); pickables.push(orb);
+          orb.userData = {kind:'locus', target:loc.target, fact:loc.fact,
+            image: loc.image && loc.image.text, station: st.name, due};
+          mkLabel(loc.target || loc.id, orb, true);
+        });
+      });
+    }
+  });
+  document.getElementById('meta').textContent =
+    `${rooms.length} rooms · ${stationCount} stations · ${lociCount} loci`;
+  controls.target.set(0,1.5,0);
+}
+
+// picking
+const raycaster = new THREE.Raycaster(); const pointer = new THREE.Vector2();
+const detail = document.getElementById('detail');
+canvas.addEventListener('click', e=>{
+  pointer.x = (e.clientX/innerWidth)*2-1; pointer.y = -(e.clientY/innerHeight)*2+1;
+  raycaster.setFromCamera(pointer, camera);
+  const hit = raycaster.intersectObjects(pickables, false)[0];
+  if (!hit){ detail.style.display='none'; return; }
+  const d = hit.object.userData;
+  detail.style.display='block';
+  document.getElementById('d-t').textContent = d.target || d.name || '';
+  document.getElementById('d-f').textContent = d.fact || d.truth || (d.station? 'at '+d.station : '');
+  document.getElementById('d-img').textContent = d.image ? '“'+d.image+'”' : (d.due? 'due '+d.due : '');
+});
+
+// idle drift + render loop
+let t0 = performance.now();
+function loop(now){
+  const dt = (now - t0)/1000; t0 = now;
+  if (idleDrift) { nodeGroup.rotation.y += dt*0.04; }
+  controls.update();
+  renderer.render(scene, camera);
+  // project labels
+  for (const l of labels){
+    const v = l.obj.position.clone(); v.applyMatrix4(nodeGroup.matrixWorld); v.project(camera);
+    if (v.z>1){ l.el.style.display='none'; continue; }
+    l.el.style.display='block';
+    l.el.style.left = ((v.x*0.5+0.5)*innerWidth)+'px';
+    l.el.style.top  = ((-v.y*0.5+0.5)*innerHeight)+'px';
+  }
+  requestAnimationFrame(loop);
+}
+function resize(){ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight); }
+addEventListener('resize', resize); resize(); requestAnimationFrame(loop);
+
+// ---- loading: inline / ?src= / file / drop ----
+function load(obj){ try { build(obj); renderEditTree(); } catch(e){ alert('Could not render palace: '+e.message); } }
+function loadText(txt){ load(JSON.parse(txt)); }
+try { load(JSON.parse(document.getElementById('palace-data').textContent)); } catch(e){}
+const src = new URLSearchParams(location.search).get('src');
+if (src) fetch(src).then(r=>r.text()).then(loadText).catch(()=>{});
+
+const drop = document.getElementById('drop');
+addEventListener('dragover', e=>{ e.preventDefault(); drop.style.display='flex'; });
+drop.addEventListener('dragleave', ()=> drop.style.display='none');
+addEventListener('drop', e=>{ e.preventDefault(); drop.style.display='none';
+  const f = e.dataTransfer.files[0]; if(!f) return; f.text().then(loadText); });
+const fileInput = document.getElementById('file');
+document.getElementById('btn-open').onclick = ()=> fileInput.click();
+fileInput.onchange = ()=>{ const f=fileInput.files[0]; if(f) f.text().then(loadText); };
+
+document.getElementById('btn-export').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(palace,null,2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = (palace.id||'palace')+'.json'; a.click(); URL.revokeObjectURL(a.href);
+};
+document.getElementById('btn-motion').onclick = (e)=>{
+  idleDrift = !idleDrift; e.target.textContent = idleDrift ? 'Pause drift' : 'Resume drift';
+};
+
+// ---- minimal builder: add room/station/locus, rename, then export ----
+const editPanel = document.getElementById('edit');
+document.getElementById('btn-edit').onclick = ()=>{
+  editPanel.style.display = editPanel.style.display==='block' ? 'none' : 'block';
+  if (editPanel.style.display==='block') renderEditTree();
+};
+function renderEditTree(){
+  if (!palace) return;
+  const isBlessing = palace.type==='blessing';
+  let html = `<h2>Build out the palace</h2>
+    <div class="row"><label>Palace title</label><input id="e-title" value="${esc(palace.title||'')}"></div>
+    <div class="row"><button id="e-addroom">+ room</button></div>
+    <div class="tree" id="e-tree"></div>
+    <div class="hint">Edits are in-memory. Export to save palace.json.</div>`;
+  editPanel.innerHTML = html;
+  document.getElementById('e-title').oninput = e=>{ palace.title=e.target.value; document.getElementById('title').textContent=e.target.value; };
+  document.getElementById('e-addroom').onclick = ()=>{
+    palace.rooms = palace.rooms||[];
+    palace.rooms.push({id:'room-'+(palace.rooms.length+1), name:'New room', surface:'slate', accent:'#7da3ff', stations: isBlessing?undefined:[]});
+    refresh();
+  };
+  const tree = document.getElementById('e-tree'); let h='';
+  (palace.rooms||[]).forEach((room,ri)=>{
+    h += `<div class="r">▸ <b>${esc(room.name||room.id)}</b>${isBlessing ? '' : ` <a data-r="${ri}" class="aw-s">+station</a>`}</div>`;
+    if (!isBlessing) (room.stations||[]).forEach((st,si)=>{
+      h += `<div class="s">• ${esc(st.name||st.id)} <a data-r="${ri}" data-s="${si}" class="aw-l" style="color:#7da3ff;cursor:pointer">+locus</a></div>`;
+      (st.loci||[]).forEach(loc=> h += `<div class="l">– ${esc(loc.target||loc.id)}</div>`);
+    });
+  });
+  tree.innerHTML = h || '<span class="hint">No rooms yet.</span>';
+  tree.querySelectorAll('.aw-s').forEach(a=> a.onclick=()=>{
+    const r=palace.rooms[+a.dataset.r]; r.stations=r.stations||[];
+    r.stations.push({id:'st-'+(r.stations.length+1), name:'New station', loci:[]}); refresh(); });
+  tree.querySelectorAll('.aw-l').forEach(a=> a.onclick=()=>{
+    const st=palace.rooms[+a.dataset.r].stations[+a.dataset.s]; st.loci=st.loci||[];
+    const target = prompt('What goes at this locus (the target)?')||'New item';
+    const image = prompt('The vivid image that encodes it:')||'';
+    st.loci.push({id:'locus-'+(st.loci.length+1), target, image:image?{text:image}:undefined}); refresh(); });
+}
+function refresh(){ build(palace); renderEditTree(); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+</script>
+</body>
+</html>

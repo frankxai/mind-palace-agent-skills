@@ -5,7 +5,7 @@ Reads the frontmatter (`name` + `description`) of every skills/*/SKILL.md and
 collects each skill's references/*.md deep-dives. Writes two artifacts kept in
 lockstep with the source:
 
-  - docs/CATALOG.md   — the human index, one section per skill
+  - docs/CATALOG.md   — the human index, grouped into the two suites
   - docs/index.html   — a self-contained dark gold/violet SPA, no build step
 
 Run after changing skills or references:
@@ -31,18 +31,32 @@ DOCS = os.path.join(ROOT, "docs")
 CATALOG = os.path.join(DOCS, "CATALOG.md")
 INDEX = os.path.join(DOCS, "index.html")
 
-# The Sunday loop order — ingest, witness, grow, onboard.
+# Two suites, each in presentation order. The step label sits under each card.
+MEMORY_ORDER = [
+    "palace-foundations", "memory-palace-architect", "loci-encoder", "number-memory",
+    "palace-walk", "spaced-recall", "imagination-gym", "agent-memory-palace", "palace-visualizer",
+]
+BLESSING_ORDER = ["github-bless", "weekly-blessing", "palace-build", "blessing-standard"]
 STEP = {
-    "github-bless": "ingest",
-    "weekly-blessing": "witness",
-    "palace-build": "grow",
-    "blessing-standard": "onboard",
+    "palace-foundations": "start here", "memory-palace-architect": "design",
+    "loci-encoder": "encode", "number-memory": "encode", "palace-walk": "retrieve",
+    "spaced-recall": "schedule", "imagination-gym": "train",
+    "agent-memory-palace": "for agents", "palace-visualizer": "render",
+    "github-bless": "ingest", "weekly-blessing": "witness",
+    "palace-build": "grow", "blessing-standard": "onboard",
 }
-STEP_ORDER = {"ingest": 0, "witness": 1, "grow": 2, "onboard": 3}
+SUITES = [("Memory Palace", MEMORY_ORDER), ("Blessing", BLESSING_ORDER)]
+
+
+def _suite_of(name: str) -> tuple[str, int, int]:
+    for si, (suite, order) in enumerate(SUITES):
+        if name in order:
+            return suite, si, order.index(name)
+    return "Other", len(SUITES), 0
 
 
 def collect() -> list[dict]:
-    """Return skills in loop order, each with name, description, refs."""
+    """Return skills grouped by suite, in presentation order."""
     skills: list[dict] = []
     for entry in sorted(os.listdir(SKILLS)):
         skill_dir = os.path.join(SKILLS, entry)
@@ -59,15 +73,18 @@ def collect() -> list[dict]:
                 if ref.endswith(".md"):
                     refs.append(ref)
         name = fm["name"]
+        suite, si, oi = _suite_of(name)
         skills.append({
             "name": name,
             "description": " ".join(fm.get("description", "").split()),
             "step": STEP.get(name, ""),
+            "suite": suite,
             "path": f"skills/{entry}/SKILL.md",
             "dir": entry,
             "refs": refs,
+            "_sort": (si, oi),
         })
-    skills.sort(key=lambda s: STEP_ORDER.get(s["step"], 99))
+    skills.sort(key=lambda s: s["_sort"])
     return skills
 
 
@@ -75,41 +92,50 @@ def render_catalog(skills: list[dict]) -> str:
     n = len(skills)
     out: list[str] = [
         "# Catalog\n\n",
-        f"The {n} skills of the **mind-palace-agent-skills** — the portable agent skills of the "
-        "[Blessing Protocol](https://github.com/frankxai/bless). Each ships as a self-contained "
-        "`SKILL.md` with two-field frontmatter (`name`, `description`) and runs in any runtime that "
-        "reads `SKILL.md` skills.\n\n",
+        f"The {n} skills of **mind-palace-agent-skills** — a real, science-grounded **Memory "
+        "Palace** suite (the method of loci, for humans and agents) plus the **Blessing Protocol** "
+        "suite ([bless](https://github.com/frankxai/bless)). Each ships as a self-contained "
+        "`SKILL.md` and runs in any runtime that reads `SKILL.md` skills.\n\n",
         "> This file is generated. After changing a skill or a reference, run "
         "`python3 scripts/generate_catalog.py`, then `python3 scripts/validate_skills.py`.\n\n",
-        "The loop: **ingest → witness → grow → onboard**.\n\n",
-        "| Skill | Step | What it does |\n|---|---|---|\n",
     ]
+    for suite, _order in SUITES:
+        members = [s for s in skills if s["suite"] == suite]
+        if not members:
+            continue
+        out.append(f"## {suite} suite\n\n")
+        out.append("| Skill | Step | What it does |\n|---|---|---|\n")
+        for s in members:
+            out.append(f"| [`{s['name']}`](../{s['path']}) | {s['step']} | {s['description']} |\n")
+        out.append("\n")
     for s in skills:
-        out.append(f"| [`{s['name']}`](../{s['path']}) | {s['step']} | {s['description']} |\n")
-    for s in skills:
-        out.append(f"\n## `{s['name']}`\n\n")
-        out.append(f"**Step:** {s['step']} · **Skill:** [`{s['path']}`](../{s['path']})\n\n")
+        out.append(f"### `{s['name']}`\n\n")
+        out.append(f"**Suite:** {s['suite']} · **Step:** {s['step']} · "
+                   f"**Skill:** [`{s['path']}`](../{s['path']})\n\n")
         out.append(f"{s['description']}\n")
         if s["refs"]:
             out.append("\n**References:**\n\n")
             for ref in s["refs"]:
                 rel = f"skills/{s['dir']}/references/{ref}"
                 out.append(f"- [`{ref}`](../{rel})\n")
-    out.append("\n---\n\nBuilt on SIP · The Blessing Protocol v0.1 · MIT\n")
+        out.append("\n")
+    out.append("---\n\nBuilt on SIP · Memory Palace Method v0.1 · The Blessing Protocol v0.1 · MIT\n")
     return "".join(out)
 
 
 def render_index(skills: list[dict]) -> str:
-    # Escape `<` so a description containing `</script>` cannot break out of the data tag (XSS).
-    data = json.dumps(skills, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+    # Strip the internal sort key, then escape `<` so a description containing
+    # `</script>` cannot break out of the data tag (XSS).
+    public = [{k: v for k, v in s.items() if k != "_sort"} for s in skills]
+    data = json.dumps(public, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     n = len(skills)
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mind-palace-agent-skills — {n} portable agent skills</title>
-<meta name="description" content="The {n} portable agent skills of the Blessing Protocol — ingest your GitHub, witness the week, grow a palace.">
+<title>mind-palace-agent-skills — {n} memory-palace agent skills</title>
+<meta name="description" content="A science-grounded memory-palace skill suite (the method of loci, for humans and AI agents) plus the Blessing Protocol — {n} portable agent skills.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -130,7 +156,7 @@ def render_index(skills: list[dict]) -> str:
   .mark{{font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--muted)}}
   h1{{font-family:var(--serif);font-weight:400;font-size:46px;line-height:1.05;margin:14px 0 10px;letter-spacing:-.01em}}
   h1 .g{{color:var(--gold)}} h1 .v{{color:var(--violet)}}
-  .tag{{color:var(--muted);font-size:18px;margin:0 auto 22px;max-width:560px}}
+  .tag{{color:var(--muted);font-size:18px;margin:0 auto 22px;max-width:600px}}
   .pills{{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}}
   .pill{{border:1px solid var(--line);border-radius:999px;padding:5px 13px;color:var(--muted);font-size:13px}}
   .pill b{{color:var(--ink);font-weight:600}}
@@ -138,6 +164,9 @@ def render_index(skills: list[dict]) -> str:
     margin:30px 0 8px;color:var(--muted);font-family:var(--mono);font-size:13.5px}}
   .loop b{{color:var(--gold);font-weight:500}}
   .loop .sep{{color:var(--line)}}
+  .suite{{grid-column:1/-1;font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--violet);margin:26px 0 2px;padding-bottom:6px;
+    border-bottom:1px solid var(--line)}}
   .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;margin-top:24px}}
   .card{{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 22px 20px;
     transition:border-color .16s,transform .16s}}
@@ -162,22 +191,23 @@ def render_index(skills: list[dict]) -> str:
 <div class="wrap">
   <header>
     <div class="mark">mind-palace-agent-skills</div>
-    <h1>Ingest your GitHub.<br><span class="g">Witness</span> the week. <span class="v">Grow</span> a palace.</h1>
-    <p class="tag">The {n} portable agent skills of the Blessing Protocol. Self-contained, runtime-agnostic, MIT-licensed.</p>
+    <h1>Build a <span class="g">mind palace</span><br>with an <span class="v">agent</span>.</h1>
+    <p class="tag">The method of loci for humans and AI agents — design, encode, recall, schedule, render. Plus the Blessing Protocol. {n} self-contained, runtime-agnostic, MIT skills.</p>
     <div class="pills">
       <span class="pill"><b>{n}</b> skills</span>
+      <span class="pill">Memory Palace</span>
       <span class="pill">Blessing Protocol v0.1</span>
       <span class="pill">MIT</span>
       <span class="pill"><a href="https://github.com/frankxai/mind-palace-agent-skills">GitHub</a></span>
     </div>
     <div class="loop">
-      <b>/sunday</b><span class="sep">→</span>ingest<span class="sep">→</span>witness<span class="sep">→</span>grow<span class="sep">→</span>onboard
+      <b>/memorize</b><span class="sep">→</span><b>/recall</b><span class="sep">·</span><b>/sunday</b><span class="sep">→</span>ingest<span class="sep">→</span>witness<span class="sep">→</span>grow
     </div>
   </header>
   <div class="grid" id="grid"></div>
   <footer>
     <div class="hair"></div>
-    Built on SIP · The Blessing Protocol v0.1 ·
+    Built on SIP · Memory Palace Method v0.1 · The Blessing Protocol v0.1 ·
     <a href="https://github.com/frankxai/bless">bless</a>
   </footer>
 </div>
@@ -186,10 +216,13 @@ def render_index(skills: list[dict]) -> str:
   const REPO = 'https://github.com/frankxai/mind-palace-agent-skills/blob/main/';
   const SKILLS = JSON.parse(document.getElementById('data').textContent);
   const esc = s => {{ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }};
+  let lastSuite = null;
   document.getElementById('grid').innerHTML = SKILLS.map(s => {{
+    let head = '';
+    if (s.suite !== lastSuite) {{ head = '<h2 class="suite">' + esc(s.suite) + ' suite</h2>'; lastSuite = s.suite; }}
     const refs = (s.refs || []).map(r =>
       '<a href="' + REPO + 'skills/' + s.dir + '/references/' + r + '">' + esc(r) + '</a>').join('');
-    return '<div class="card">' +
+    return head + '<div class="card">' +
       (s.step ? '<span class="step">' + esc(s.step) + '</span>' : '') +
       '<h3><a href="' + REPO + s.path + '">' + esc(s.name) + '</a></h3>' +
       '<p>' + esc(s.description) + '</p>' +

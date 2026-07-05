@@ -1,0 +1,19 @@
+{
+  "description": "Reproducible base-image set for the palace. Surfaces match the shared material vocabulary (Blessing SPEC v0.1 §5). Generate with any image model; the viewer works without them (procedural fallback). Recommended model: nano_banana_pro / NB2 via the ~~image-generation connector, 1:1, 1k+.",
+  "negativePrompt": "no text, no labels, no watermark, no people",
+  "textures": {
+    "obsidian": "seamless tileable texture of polished black obsidian stone, dark studio lighting, subtle cool reflections, photographic, top-down flat, even lighting",
+    "slate": "seamless tileable texture of matte grey-blue slate stone, fine grain, soft diffuse light, photographic, top-down flat",
+    "bronze": "seamless tileable texture of brushed warm bronze metal, low specular highlights, photographic, top-down flat",
+    "marble": "seamless tileable texture of pale cream marble with faint grey veining, soft light, photographic, top-down flat",
+    "glass": "seamless tileable texture of dark frosted glass with faint blue internal refraction, photographic, top-down flat",
+    "aurora": "seamless tileable texture of deep teal iridescent surface with soft aurora sheen, photographic, top-down flat"
+  },
+  "scenes": {
+    "childhood-home": "interior of a warm familiar childhood home hallway, doors and a coat rack, dim cinematic single key light, dark background, photographic, atmospheric, empty",
+    "ancient-library": "vast ancient library hall with tall shelves and reading desks, single dramatic key light, dark moody background, photographic, empty",
+    "forest-path": "quiet forest path with distinct landmark trees and a stone bench, soft directional light, dark background, photographic, empty",
+    "space-station": "sleek interior corridor of a space station with bays and consoles, cool key light, dark background, photographic, empty",
+    "museum-hall": "grand museum hall with plinths and alcoves for exhibits, single warm key light, dark background, photographic, empty"
+  }
+}

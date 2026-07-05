@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mind-palace-agent-skills",
+  "description": "Memory-palace agent skills — the method of loci for humans and AI agents (design, encode, recall, schedule, render) plus the Blessing Protocol suite.",
+  "plugins": [
+    {
+      "name": "mind-palace-agent-skills",
+      "description": "All 13 skills (Memory Palace + Blessing) and their commands.",
+      "source": "./",
+      "strict": false,
+      "skills": ["skills"]
+    }
+  ]
+}

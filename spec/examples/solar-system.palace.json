@@ -1,0 +1,91 @@
+{
+  "type": "memory-palace",
+  "version": "0.1",
+  "id": "solar-system-palace",
+  "title": "The Solar System, in order from the Sun",
+  "owner": "frankxai",
+  "locus": {
+    "kind": "imagined",
+    "basis": "childhood home",
+    "route": "front door -> hallway -> kitchen -> stairs -> bedroom"
+  },
+  "rooms": [
+    {
+      "id": "hallway",
+      "name": "The Hallway",
+      "order": 0,
+      "surface": "marble",
+      "accent": "#ffcf6b",
+      "stations": [
+        {
+          "id": "coat-rack",
+          "name": "Coat rack by the door",
+          "order": 0,
+          "loci": [
+            {
+              "id": "mercury",
+              "target": "Mercury",
+              "fact": "smallest planet, closest to the Sun",
+              "image": {
+                "text": "A tiny silver ball-bearing melting on the hot brass coat hook, hissing and dripping.",
+                "techniques": ["bizarreness", "multisensory", "exaggeration"],
+                "prompt": "macro photo, molten silver bead on a brass hook, heat shimmer, dark marble hall, dramatic key light",
+                "asset": "assets/generated/mercury-coatrack.png"
+              }
+            }
+          ]
+        },
+        {
+          "id": "mirror",
+          "name": "The hallway mirror",
+          "order": 1,
+          "loci": [
+            {
+              "id": "venus",
+              "target": "Venus",
+              "fact": "hottest planet, thick toxic clouds",
+              "image": {
+                "text": "The mirror fogs over with hot yellow sulfur steam; a goddess coughs inside the glass.",
+                "techniques": ["multisensory", "emotion"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kitchen",
+      "name": "The Kitchen",
+      "order": 1,
+      "surface": "slate",
+      "accent": "#7da3ff",
+      "stations": [
+        {
+          "id": "table",
+          "name": "Kitchen table",
+          "order": 0,
+          "loci": [
+            {
+              "id": "earth",
+              "target": "Earth",
+              "fact": "the only planet with known life",
+              "image": {
+                "text": "A blue-green marble spinning on the table, sprouting tiny waving forests as it turns.",
+                "techniques": ["motion", "dual-coding", "self-reference"]
+              },
+              "recall": {
+                "scheduler": "fsrs",
+                "stability": 2.4,
+                "difficulty": 5.1,
+                "due": "2026-06-21",
+                "reps": 1,
+                "lapses": 0,
+                "lastReviewed": "2026-06-14"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

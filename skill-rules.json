@@ -1,7 +1,91 @@
 {
-  "version": "0.1",
-  "description": "Auto-activation rules for the mind-palace-agent-skills — the portable agent skills of the Blessing Protocol (github.com/frankxai/bless).",
+  "version": "0.2",
+  "description": "Auto-activation rules for mind-palace-agent-skills — the Memory Palace suite (the method of loci, for humans and agents) plus the Blessing suite (github.com/frankxai/bless).",
   "skills": {
+    "palace-foundations": {
+      "priority": "high",
+      "description": "Teach the method of loci and route to the right memory-palace skill — the start-here.",
+      "skill_path": "skills/palace-foundations/SKILL.md",
+      "triggers": {
+        "keywords": ["memory palace", "mind palace", "method of loci", "teach me to memorize", "how do i remember", "help me memorize", "memory technique", "memorize a list"],
+        "precedes": ["memory-palace-architect", "loci-encoder", "number-memory"],
+        "commands": ["/palace-new", "/memorize"]
+      }
+    },
+    "memory-palace-architect": {
+      "priority": "high",
+      "description": "Design a palace — choose a locus, lay a fixed non-crossing route, space the stations.",
+      "skill_path": "skills/memory-palace-architect/SKILL.md",
+      "triggers": {
+        "keywords": ["design a memory palace", "pick a place to memorize", "lay out my palace", "map a route", "build a palace structure", "loci", "body method"],
+        "precedes": ["loci-encoder"],
+        "commands": ["/palace-new"]
+      }
+    },
+    "loci-encoder": {
+      "priority": "high",
+      "description": "Turn targets into vivid images and place them at stations — bizarreness, multisensory, dual-coding.",
+      "skill_path": "skills/loci-encoder/SKILL.md",
+      "triggers": {
+        "keywords": ["encode these items", "make images for my palace", "turn this list into pictures", "remember names and faces", "memorable image", "mnemonic image"],
+        "follows": ["memory-palace-architect", "number-memory"],
+        "commands": ["/memorize"]
+      }
+    },
+    "number-memory": {
+      "priority": "medium",
+      "description": "Memorize digits, dates, phone numbers, and cards via Major / Dominic / PAO systems.",
+      "skill_path": "skills/number-memory/SKILL.md",
+      "triggers": {
+        "keywords": ["memorize this number", "remember these dates", "memorize a deck of cards", "pao system", "major system", "dominic system", "remember a phone number", "memorize digits"],
+        "precedes": ["loci-encoder"]
+      }
+    },
+    "palace-walk": {
+      "priority": "high",
+      "description": "Walk the palace from memory to self-test, score loci, and repair the weak ones.",
+      "skill_path": "skills/palace-walk/SKILL.md",
+      "triggers": {
+        "keywords": ["test me on my palace", "let me recall", "walk my palace", "quiz me", "review my palace", "recall the list"],
+        "follows": ["loci-encoder"],
+        "commands": ["/recall"]
+      }
+    },
+    "spaced-recall": {
+      "priority": "medium",
+      "description": "Schedule spaced repetition (FSRS / SM-2) over the palace and export to Anki — durable retention.",
+      "skill_path": "skills/spaced-recall/SKILL.md",
+      "triggers": {
+        "keywords": ["spaced repetition", "when should i review", "schedule my reviews", "keep this long-term", "export to anki", "fsrs", "sm-2", "what's due"],
+        "follows": ["palace-walk"],
+        "commands": ["/recall"]
+      }
+    },
+    "imagination-gym": {
+      "priority": "medium",
+      "description": "Train mental-imagery vividness and scene construction so encoding works better.",
+      "skill_path": "skills/imagination-gym/SKILL.md",
+      "triggers": {
+        "keywords": ["my mental pictures are weak", "i can't visualize", "train my imagination", "see images more clearly", "visualization practice", "aphantasia"]
+      }
+    },
+    "agent-memory-palace": {
+      "priority": "high",
+      "description": "Persistent, navigable memory for an AI agent across sessions, stored as a palace.json knowledge store.",
+      "skill_path": "skills/agent-memory-palace/SKILL.md",
+      "triggers": {
+        "keywords": ["remember this across sessions", "give the agent long-term memory", "persistent context", "agent memory", "knowledge graph for my agent", "persistent agent memory"]
+      }
+    },
+    "palace-visualizer": {
+      "priority": "medium",
+      "description": "Render a palace as a standalone HTML viewer plus per-locus image prompts.",
+      "skill_path": "skills/palace-visualizer/SKILL.md",
+      "triggers": {
+        "keywords": ["render my palace", "visualize the palace", "make a picture of my memory palace", "build out the palace", "palace html", "see my palace"],
+        "follows": ["loci-encoder"]
+      }
+    },
     "github-bless": {
       "priority": "high",
       "description": "Ingest a builder's GitHub + connectors and roll the week into a blessable candidate set.",

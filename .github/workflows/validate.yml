@@ -21,3 +21,6 @@ jobs:
 
       - name: Check catalog + Pages index are in sync
         run: python3 scripts/generate_catalog.py --check
+
+      - name: Build distribution (smoke)
+        run: python3 scripts/build_dist.py --no-assets
