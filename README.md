@@ -96,8 +96,8 @@ A browsable catalog is generated to [`docs/`](docs/CATALOG.md) and served via Gi
 |---|---|
 | [**bless**](https://github.com/frankxai/bless) | The open standard — the Blessing Protocol |
 | [**mind-palace-agent-skills**](https://github.com/frankxai/mind-palace-agent-skills) | Portable agent skills — Memory Palace + Blessing |
-| [**frankx-mind-palace**](https://github.com/frankxai/frankx-mind-palace) | The mind — Frank's blessed work as data |
-| [**frankx-palace**](https://github.com/frankxai/frankx-palace) | The palace — the 3D memory palace that grows each Sunday |
+| **frankx-mind-palace** | The mind — Frank's blessed work as data. Private, not a public GitHub repo. |
+| **frankx-palace** | The palace — the 3D memory palace that grows each Sunday. Private, not a public GitHub repo. |
 
 ## Part of the Mind Intelligence ecosystem
 
