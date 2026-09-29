@@ -8,7 +8,13 @@
       "description": "All 13 skills (Memory Palace + Blessing) and their commands.",
       "source": "./",
       "strict": false,
-      "skills": ["skills"]
+      "skills": [
+        "./skills"
+      ]
     }
-  ]
+  ],
+  "owner": {
+    "name": "FrankX",
+    "url": "https://github.com/frankxai"
+  }
 }
