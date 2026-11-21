@@ -1,4 +1,5 @@
 import io
+import json
 import tempfile
 import unittest
 import zipfile
@@ -16,6 +17,18 @@ def package(includes, lean=False):
 
 
 class DistributionTests(unittest.TestCase):
+    def test_packaged_example_starts_fresh_and_uses_only_shipped_images(self):
+        folder = "skills/agent-memory-palace"
+        with package([folder]) as archive:
+            sample = json.loads(archive.read(folder + "/spec/examples/solar-system.palace.json"))
+            for room in sample["rooms"]:
+                for station in room["stations"]:
+                    for locus in station["loci"]:
+                        self.assertNotIn("recall", locus)
+                        image_path = locus.get("image", {}).get("asset")
+                        if image_path:
+                            self.assertIn(folder + "/" + image_path, archive.namelist())
+
     def test_memory_agent_carries_a_working_example_and_its_contract(self):
         folder = "skills/agent-memory-palace"
         with package([folder], lean=True) as archive:
