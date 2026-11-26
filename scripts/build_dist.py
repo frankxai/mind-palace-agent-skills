@@ -8,14 +8,17 @@ Validates first, then emits downloadable zips under dist/:
 
 Usage:
   python scripts/build_dist.py              # full build (includes assets/)
-  python scripts/build_dist.py --no-assets  # lean build (skip assets/, smaller zips)
+  python scripts/build_dist.py --no-assets  # lean build, keeping required skill resources
+  python scripts/build_dist.py --skill palace-visualizer  # write just this skill's zip
 
-Pure stdlib. Deterministic (sorted) so zips are reproducible.
+Uses the Python standard library.
 """
 from __future__ import annotations
 
+import argparse
 import subprocess
 import sys
+import tempfile
 import zipfile
 from pathlib import Path
 
@@ -87,17 +90,39 @@ def iter_files(rel_root: str, no_assets: bool):
         yield path, path.relative_to(ROOT).as_posix()
 
 
+def write_contents(zf: zipfile.ZipFile, includes: list[str], no_assets: bool, extra: dict[str, str]):
+    for rel in includes:
+        for source, arc in iter_files(rel, no_assets):
+            zf.write(source, arc)
+            parts = arc.split("/")
+            if len(parts) != 3 or parts[0] != "skills" or parts[2] != "SKILL.md":
+                continue
+            # Members copy this directory out of the archive. Required resources
+            # must travel with it, including the viewer in a lean distribution.
+            folder = source.parent.name
+            resources = ["LICENSE"]
+            body = source.read_text(encoding="utf-8")
+            if "spec/" in body:
+                resources.extend(["spec/MEMORY-PALACE-METHOD.md", "spec/palace.schema.json",
+                                  "spec/examples/solar-system.palace.json"])
+            if folder in {"memory-palace-architect", "palace-visualizer"}:
+                resources.extend(["assets/ASSETS.md", "assets/manifest.json"])
+            if folder == "palace-visualizer":
+                resources.append("assets/palace-viewer/index.html")
+            for resource in resources:
+                zf.write(ROOT / resource, f"skills/{folder}/{resource}")
+    for name, body in extra.items():
+        zf.writestr(name, body)
+    return len(zf.infolist())
+
+
 def write_zip(zip_path: Path, includes: list[str], no_assets: bool, extra: dict[str, str] | None = None) -> tuple[int, int]:
     zip_path.parent.mkdir(parents=True, exist_ok=True)
-    count = 0
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for rel in includes:
-            for abs_path, arc in iter_files(rel, no_assets):
-                zf.write(abs_path, arc)
-                count += 1
-        for name, body in (extra or {}).items():
-            zf.writestr(name, body)
-            count += 1
+    with tempfile.TemporaryDirectory(dir=zip_path.parent) as staging:
+        candidate = Path(staging) / zip_path.name
+        with zipfile.ZipFile(candidate, "w", zipfile.ZIP_DEFLATED) as zf:
+            count = write_contents(zf, includes, no_assets, extra or {})
+        candidate.replace(zip_path)
     return count, zip_path.stat().st_size
 
 
@@ -110,7 +135,12 @@ def human(size: int) -> str:
 
 
 def main() -> int:
-    no_assets = "--no-assets" in sys.argv[1:]
+    names = sorted(path.parent.name for path in (ROOT / "skills").glob("*/SKILL.md"))
+    parser = argparse.ArgumentParser(description="Build all kits or one installable skill.")
+    parser.add_argument("--skill", choices=names, help="write only this skill's zip and preserve other kits")
+    parser.add_argument("--no-assets", action="store_true", help="omit optional top-level artwork")
+    args = parser.parse_args()
+    no_assets = args.no_assets
 
     # Step 0 — never ship invalid skills.
     print("validating…")
@@ -118,6 +148,11 @@ def main() -> int:
     if rc != 0:
         print("ABORT — validation failed")
         return rc
+
+    if args.skill:
+        path, count, size = write_skill(args.skill, no_assets)
+        print(f"{path}: {count} files, {human(size)}")
+        return 0
 
     if DIST.exists():
         import shutil
@@ -137,16 +172,22 @@ def main() -> int:
                           extra={"INSTALL.md": spec["install"]})
         built.append((f"kits/{name}.zip", n, sz))
 
-    for skill_md in sorted((ROOT / "skills").glob("*/SKILL.md")):
-        name = skill_md.parent.name
-        n, sz = write_zip(DIST / "skills" / f"{name}.zip", [f"skills/{name}"], no_assets,
-                          extra={"INSTALL.md": f"# {name}\n\nCopy this skill into your agent:\n\n    cp -r skills/{name} ~/.claude/skills/\n"})
-        built.append((f"skills/{name}.zip", n, sz))
+    for name in names:
+        path, n, sz = write_skill(name, no_assets)
+        built.append((path.relative_to(DIST).as_posix(), n, sz))
 
     print(f"\nbuilt {len(built)} zips under dist/{' (no assets)' if no_assets else ''}:")
     for rel, n, sz in built:
         print(f"  {rel:42} {n:4d} files  {human(sz):>8}")
     return 0
+
+
+def write_skill(name: str, no_assets: bool):
+    path = DIST / "skills" / f"{name}.zip"
+    install = (f"# {name}\n\nAfter extracting this archive, copy the entire skills/{name} folder "
+               "into your runtime's skills directory. Keep its references and license alongside SKILL.md.\n")
+    n, size = write_zip(path, [f"skills/{name}"], no_assets, {"INSTALL.md": install})
+    return path, n, size
 
 
 if __name__ == "__main__":

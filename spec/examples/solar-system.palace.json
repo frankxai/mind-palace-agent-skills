@@ -3,10 +3,9 @@
   "version": "0.1",
   "id": "solar-system-palace",
   "title": "The Solar System, in order from the Sun",
-  "owner": "frankxai",
   "locus": {
     "kind": "imagined",
-    "basis": "childhood home",
+    "basis": "an imagined house",
     "route": "front door -> hallway -> kitchen -> stairs -> bedroom"
   },
   "rooms": [
@@ -29,8 +28,7 @@
               "image": {
                 "text": "A tiny silver ball-bearing melting on the hot brass coat hook, hissing and dripping.",
                 "techniques": ["bizarreness", "multisensory", "exaggeration"],
-                "prompt": "macro photo, molten silver bead on a brass hook, heat shimmer, dark marble hall, dramatic key light",
-                "asset": "assets/generated/mercury-coatrack.png"
+                "prompt": "macro photo, molten silver bead on a brass hook, heat shimmer, dark marble hall, dramatic key light"
               }
             }
           ]
@@ -72,15 +70,6 @@
               "image": {
                 "text": "A blue-green marble spinning on the table, sprouting tiny waving forests as it turns.",
                 "techniques": ["motion", "dual-coding", "self-reference"]
-              },
-              "recall": {
-                "scheduler": "fsrs",
-                "stability": 2.4,
-                "difficulty": 5.1,
-                "due": "2026-06-21",
-                "reps": 1,
-                "lapses": 0,
-                "lastReviewed": "2026-06-14"
               }
             }
           ]

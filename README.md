@@ -64,18 +64,29 @@ deep-dive — the [voice register](skills/weekly-blessing/references/voice-regis
 
 ## Install
 
-**Download a kit** — grab a zip from the latest [release](../../releases)
-(`mind-palace-skills.zip`, or a per-platform kit), unzip, follow its `INSTALL.md`.
+**Use one skill.** With Python 3 and a checkout of this repository, run the following
+command from the repository root. It uses the standard library.
+
+```bash
+python3 scripts/build_dist.py --skill palace-visualizer
+```
+
+Extract `dist/skills/palace-visualizer.zip` and copy its complete
+`skills/palace-visualizer` directory into your runtime's skill directory.
+Open `assets/palace-viewer/index.html` inside that copy to try the viewer.
+The same command accepts any skill folder name. See [release assets](../../releases)
+for packaged versions when available.
 
 **Claude Code (plugin)** — `/plugin marketplace add frankxai/mind-palace-agent-skills`
 
-**Clone & copy**
+**Build the complete kit**
 ```bash
 git clone https://github.com/frankxai/mind-palace-agent-skills
-cp -r mind-palace-agent-skills/skills/*    ~/.claude/skills/
-cp -r mind-palace-agent-skills/commands/*  ~/.claude/commands/
+cd mind-palace-agent-skills
+python3 scripts/build_dist.py
 ```
 
+Extract the kit for your runtime from `dist/kits/` and follow its `INSTALL.md`.
 Other runtimes (ChatGPT, Cursor, Codex, Gemini): see [`MULTI_RUNTIME.md`](MULTI_RUNTIME.md). `SKILL.md`
 is universal; only the install path differs.
 
